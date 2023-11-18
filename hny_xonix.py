@@ -279,16 +279,19 @@ class Enemy(pygame.sprite.Sprite):
             iXNn = tx // SPRITE_SIZE
             iYNn = ty // SPRITE_SIZE
             # обработаем выход за территорию со снегом
-            if (self.scene.sprites_matrix[iYOn][iXOn] != None) and \
-                    (self.scene.sprites_matrix[iYNn][iXNn] == None): # вышли за пределы снега
-                if ( self.scene.sprites_matrix[iYNn-1][iXNn]==None and
-                        self.scene.sprites_matrix[iYNn+1][iXNn] == None ): # это вертикальная граница снега
-                    self.dx = - self.dx # отразим от вертикалной границы снега
+            if ( isinstance( self.scene.sprites_matrix[iYOn][iXOn], Snow) ) and \
+                   not isinstance(self.scene.sprites_matrix[iYNn][iXNn], Snow ) : # вышли за пределы снега
+                if not isinstance(self.scene.sprites_matrix[iYNn-1][iXNn], Snow) and \
+                    not isinstance( self.scene.sprites_matrix[iYNn+1][iXNn], Snow ): # это вертикальная граница снега
+                    self.dx = - self.dx # отразим от вертикальной границы снега
                     return
-                if ( self.scene.sprites_matrix[iYNn][iXNn-1]==None and
-                        self.scene.sprites_matrix[iYNn][iXNn+1] == None ): # это горизонтальная граница снега
+                elif not isinstance( self.scene.sprites_matrix[iYNn][iXNn-1], Snow ) and \
+                    not  isinstance( self.scene.sprites_matrix[iYNn][iXNn+1], Snow ): # это горизонтальная граница снега
                     self.dy = - self.dy # отразим от горизонтальной границы снега
                     return
+                else:
+                    self.dx = - self.dx
+                    self.dy = - self.dy
 
             self.rect.x = tx
             self.rect.y = ty
@@ -298,13 +301,15 @@ class Enemy(pygame.sprite.Sprite):
     def process_collissions(self):
         hits = pygame.sprite.spritecollide(self, self.scene.crushed_sprites, False)
         for hit in hits:
-            self.scene.reload_scene()
+            self.scene.player_lose_scene()
 
 class Scene(): # класс представляющий и управляющий сценой игры
     def __init__(self):  # констуктор
         self.load_scene()
 
     def load_scene(self): # код по инициализации и загрузке всей сцены....
+        self.player_win_in_this_scene = False
+        self.REMAINING_PERCENTS_WIN = 15
         # ------ инициализация матрицы спрайтов
         self.MATRIX_WIDTH = WIDTH // SPRITE_SIZE
         self.MATRIX_HEIGHT = HEIGHT // SPRITE_SIZE
@@ -360,11 +365,12 @@ class Scene(): # класс представляющий и управляющи
         pass
         self.logic_colors_counts = {"green": 0, "red": 0}  # счётчик клеток для зон заливки алгоритма floofill
         pass
-        self.enemy = Enemy(self)
-        self.all_sprites.add( self.enemy )
+        self.enemy1 = Enemy(self)
+        self.all_sprites.add(self.enemy1)
+        self.enemy2 = Enemy(self)
+        self.all_sprites.add(self.enemy2)
 
     def unload_scene(self):
-
         self.clear_colors()
         for iy in range(0, self.MATRIX_HEIGHT ):
             for ix in range(0, self.MATRIX_WIDTH ):
@@ -374,17 +380,22 @@ class Scene(): # класс представляющий и управляющи
         self.sprite_ded_moroz.y=0
         self.sprite_ded_moroz.x=SPRITE_SIZE
         self.all_sprites.remove( self.sprite_ded_moroz )
+        self.sprite_ded_moroz.kill()
+        self.enemy1.kill()
+        self.enemy2.kill()
 
     def reload_scene(self):
         self.unload_scene()
         self.load_scene()
 
     def player_win_scene(self):
+        self.unload_scene()
+        self.player_win_in_this_scene = True
         print("!!!!!!!!!! PLAYER WIN !!!!!!!!!!!!!!")
 
     def player_lose_scene(self):
-        print("!!!!!!!!!! PLAYER LOSE !!!!!!!!!!!!!!")
         self.reload_scene()
+        print("!!!!!!!!!! PLAYER LOSE !!!!!!!!!!!!!!")
 
     def matrix_index_of(self, sprites_matrix_var, sprite):  # реализация функции index_of для матриц спрайтов
                                                           # возвращает индекс в матрице по объекту спрайта
@@ -408,6 +419,17 @@ class Scene(): # класс представляющий и управляющи
     def update(self):
         self.all_sprites.update()  # вызовем методы update для всех спрайтов в коллекции
 
+    def get_remaining_percents(self):
+        total_snow = self.MATRIX_HEIGHT * self.MATRIX_WIDTH
+        remaining_snow = 0
+        for tile in self.snow_sprites:
+            if isinstance(tile, Snow):
+                if not tile.crushed:
+                    remaining_snow += 1
+        one_percent = float(total_snow / 100)
+        remaining_percents = remaining_snow / one_percent
+        return remaining_percents
+
     def clear_colors(self): #
         self.logic_colors_counts = {"green": 0, "red": 0}
         for iy in range(1, self.MATRIX_HEIGHT - 1):
@@ -415,33 +437,57 @@ class Scene(): # класс представляющий и управляющи
                 if isinstance( self.sprites_matrix[iy][ix] , Snow ):
                     self.sprites_matrix[iy][ix].logic_color = ""
 
+    def enemy_in_the_block(self,block_color): # возвращает истину если в блоке указанного цвета есть враг
+        hits = pygame.sprite.spritecollide(self.enemy1, self.snow_sprites, False)
+        for hit in hits:
+            if hit.logic_color == block_color:
+                return True
+        hits = pygame.sprite.spritecollide(self.enemy2, self.snow_sprites, False)
+        for hit in hits:
+            if hit.logic_color == block_color:
+                return True
+        return False
+
 
     def process_hide_snow_sprites(self, begin_cell_1, begin_cell_2 ): # обрабатываем скрытие зон спрайтов на поле
         self.floodfill_sprites_zone( begin_cell_1[0], begin_cell_1[1], "green"  )
         self.floodfill_sprites_zone( begin_cell_2[0], begin_cell_2[1],  "red" )
         if self.logic_colors_counts["green"] < self.logic_colors_counts["red"]:
-            clear_color = "green"
-            remaining_color = "red"
+            lowest_color = "green"
+            biggest_color = "red"
         else:
-            clear_color = "red"
-            remaining_color = "green"
-        for iy in range(1, self.MATRIX_HEIGHT - 1):
-            for ix in range(1, self.MATRIX_WIDTH - 1):
-                if isinstance( self.sprites_matrix[iy][ix] , Snow ):
-                    if ( self.sprites_matrix[iy][ix].logic_color == clear_color ) or \
-                       ( self.sprites_matrix[iy][ix].crushed == True ):
-                        self.sprites_matrix[iy][ix].kill()
-                        self.sprites_matrix[iy][ix]=None
-                    else:
-                        self.sprites_matrix[iy][ix].logic_color = ""
-
-        total_snow_tiles_on_start = ( (self.MATRIX_WIDTH - 2) * (self.MATRIX_HEIGHT-2) )
-        one_percent_quantity = float( total_snow_tiles_on_start / 100 )
-        remaining_percents = float( self.logic_colors_counts[remaining_color] / one_percent_quantity )
-        print( "#####",remaining_percents )
+            lowest_color = "red"
+            biggest_color = "green"
+        if ( self.enemy_in_the_block(lowest_color) == False ): # в отсечённой меньшей зоне нет врагов
+            for iy in range(1, self.MATRIX_HEIGHT - 1): # погасим зону цвета lowest_color
+                for ix in range(1, self.MATRIX_WIDTH - 1):
+                    if isinstance( self.sprites_matrix[iy][ix] , Snow ):
+                        if ( self.sprites_matrix[iy][ix].logic_color == lowest_color ) or \
+                           ( self.sprites_matrix[iy][ix].crushed == True ):
+                            self.sprites_matrix[iy][ix].kill()
+                            self.sprites_matrix[iy][ix]=None
+                        else:
+                            self.sprites_matrix[iy][ix].logic_color = ""
+        elif ( self.enemy_in_the_block(biggest_color) == False ): # если в отсечённой бОльшей зоне нет врагов:
+            for iy in range(1, self.MATRIX_HEIGHT - 1): # погасим зону цвета biggest_color
+                for ix in range(1, self.MATRIX_WIDTH - 1):
+                    if isinstance(self.sprites_matrix[iy][ix], Snow):
+                        if (self.sprites_matrix[iy][ix].logic_color == biggest_color ) or \
+                                (self.sprites_matrix[iy][ix].crushed == True):
+                            self.sprites_matrix[iy][ix].kill()
+                            self.sprites_matrix[iy][ix] = None
+                        else:
+                            self.sprites_matrix[iy][ix].logic_color = ""
+        else: # в обоих блоках есть враги!
+            for tile in self.crushed_sprites: # погасим след деда мороза
+                iy, ix = self.matrix_index_of( self.sprites_matrix, tile )
+                tile.kill()
+                self.sprites_matrix[iy][ix] = None
         pass
         self.clear_colors()
         pass
+        if self.get_remaining_percents() <= self.REMAINING_PERCENTS_WIN:
+            self.player_win_scene()
 
     def floodfill_sprites_zone(self, begin_y , begin_x,  logic_color  ):# возвращает количество заполненых ячеек
         if not isinstance( self.sprites_matrix[begin_y][begin_x] , Snow ) :
@@ -492,6 +538,8 @@ while True:
         screen.blit(image_hidden, image_hidden_rect)  # выводим фоновую картинку
         scene.all_sprites.draw(screen)  # отрисовываем все спрайты встроенной функцией pygame
 
+    if scene.player_win_in_this_scene:
+        draw_text(screen, "Победа за Вами ! ", 72, WIDTH // 2, 0)
 
     # После отрисовки всего, меняем экранные страницы #
     pygame.display.flip()
