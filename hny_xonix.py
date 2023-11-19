@@ -8,8 +8,7 @@ import sys
 sys.setrecursionlimit(5000)
 # ------ настройка путей для игры
 chdir(path.dirname(__file__))
-dragons_dir = path.join(path.dirname(__file__), 'dragons') # определяем путь до папки с картинками
-print("^^^^", dragons_dir )
+dragons_dir = "dragons" # папка с картинками драконов !
 # ------ переменные настройки игры
 SPRITE_SIZE = 15
 WIDTH = 1024 # константа ширины окна игры
