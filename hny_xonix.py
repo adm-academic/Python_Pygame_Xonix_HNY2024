@@ -5,7 +5,7 @@ import inspect
 import sys
 
 # ------ настройка интерпретатора питон
-sys.setrecursionlimit(5000)
+sys.setrecursionlimit(50000)
 # ------ настройка путей для игры
 chdir(path.dirname(__file__))
 dragons_dir = "dragons" # папка с картинками драконов !
@@ -40,10 +40,6 @@ image_snow_crushed = pygame.image.load("snow_crushed.png").convert()
 image_snow_old  = pygame.image.load("snow_old.png").convert()
 image_ded_moroz = pygame.image.load("ded_moroz.png").convert()
 image_enemy     = pygame.image.load("enemy.png").convert()
-image_hidden    = pygame.image.load( path.join(dragons_dir, "drakon4.jpg") ).convert()
-print("*****", path.join(dragons_dir, "drakon4.jpg") )
-image_hidden    = pygame.transform.scale(image_hidden, (WIDTH, HEIGHT))
-image_hidden_rect = image_hidden.get_rect()
 
 # функция отрисовки текста на поверхности
 def draw_text(surf, text, size, x, y):
@@ -311,6 +307,13 @@ class Scene(): # класс представляющий и управляющи
     def load_scene(self): # код по инициализации и загрузке всей сцены....
         self.player_win_in_this_scene = False
         self.REMAINING_PERCENTS_WIN = 15
+        # ------ скрытая картинка для сцены
+        self.image_hidden = pygame.image.load(path.join(dragons_dir, "drakon4.jpg")).convert()
+        print("*****", path.join(dragons_dir, "drakon4.jpg"))
+        self.image_hidden = pygame.transform.scale(self.image_hidden, (WIDTH, HEIGHT))
+        self.image_hidden_rect = self.image_hidden.get_rect()
+        self.BLUR_RATIO = 50
+        self.blured_hidden_image = True
         # ------ инициализация матрицы спрайтов
         self.MATRIX_WIDTH = WIDTH // SPRITE_SIZE
         self.MATRIX_HEIGHT = HEIGHT // SPRITE_SIZE
@@ -370,8 +373,16 @@ class Scene(): # класс представляющий и управляющи
         self.all_sprites.add(self.enemy1)
         self.enemy2 = Enemy(self)
         self.all_sprites.add(self.enemy2)
+        # ------- инициализиуем падающий снег --------
+        self.snow_list = []
+        # Пройдемся 50 раз циклом и добавьм снежинки в рандомную позицию x,y
+        for i in range(500):
+            x = random.randrange(0, WIDTH)
+            y = random.randrange(0, HEIGHT)
+            self.snow_list.append([x, y])
 
     def unload_scene(self):
+        self.blured_hidden_image = True
         self.clear_colors()
         for iy in range(0, self.MATRIX_HEIGHT ):
             for ix in range(0, self.MATRIX_WIDTH ):
@@ -392,11 +403,46 @@ class Scene(): # класс представляющий и управляющи
     def player_win_scene(self):
         self.unload_scene()
         self.player_win_in_this_scene = True
+        self.blured_hidden_image = False
         print("!!!!!!!!!! PLAYER WIN !!!!!!!!!!!!!!")
 
     def player_lose_scene(self):
         self.reload_scene()
         print("!!!!!!!!!! PLAYER LOSE !!!!!!!!!!!!!!")
+
+    def get_blurSurf(self, surface, amt): # размывает указанную поверхность
+        """
+        Blur the given surface by the given 'amount'.  Only values 1 and greater
+        are valid.  Value 1 = no blur.
+        """
+        if amt < 1.0:
+            raise ValueError("Arg 'amt' must be greater than 1.0, passed in value is %s" % amt)
+        scale = 1.0 / float(amt)
+        surf_size = surface.get_size()
+        scale_size = (int(surf_size[0] * scale), int(surf_size[1] * scale))
+        surf = pygame.transform.smoothscale(surface, scale_size)
+        surf = pygame.transform.smoothscale(surf, surf_size)
+        return surf
+
+    def draw_hidden_image(self):
+        if self.blured_hidden_image:
+            imgb_hidden = self.get_blurSurf(self.image_hidden, self.BLUR_RATIO)
+            screen.blit( imgb_hidden, self.image_hidden_rect )  # выводим фоновую картинку с размытием
+        else:
+            screen.blit(self.image_hidden, self.image_hidden_rect)
+
+    def draw_snow_fall(self):
+        # обработка каждой снежинки
+        for i in range(len(self.snow_list)):
+            # нарисовать снежинку
+            pygame.draw.circle(screen, WHITE, self.snow_list[i], 2)
+            # снежинка вниз на 1
+            self.snow_list[i][1] += 1
+            if self.snow_list[i][1] > HEIGHT:
+                y = random.randrange(-50, -10)
+                self.snow_list[i][1] = y
+                x = random.randrange(0, WIDTH)
+                self.snow_list[i][0] = x
 
     def matrix_index_of(self, sprites_matrix_var, sprite):  # реализация функции index_of для матриц спрайтов
                                                           # возвращает индекс в матрице по объекту спрайта
@@ -530,17 +576,20 @@ while True:
 
     scene.update() # вызыает метод update для спрайтов всей сцены
 
+
     # Рендеринг сцены
     screen.fill(BLACK)  # заполняем всё окно чёрным
     if flip_image_hidden:
         scene.all_sprites.draw(screen)  # отрисовываем все спрайты встроенной функцией pygame
-        screen.blit(image_hidden, image_hidden_rect)  # выводим фоновую картинку
+        scene.draw_hidden_image()  # выводим фоновую картинку
     else:
-        screen.blit(image_hidden, image_hidden_rect)  # выводим фоновую картинку
+        scene.draw_hidden_image()  # выводим фоновую картинку
         scene.all_sprites.draw(screen)  # отрисовываем все спрайты встроенной функцией pygame
 
     if scene.player_win_in_this_scene:
+        scene.draw_hidden_image()  # выводим фоновую картинку
         draw_text(screen, "Победа за Вами ! ", 72, WIDTH // 2, 0)
+        scene.draw_snow_fall()
 
     # После отрисовки всего, меняем экранные страницы #
     pygame.display.flip()
