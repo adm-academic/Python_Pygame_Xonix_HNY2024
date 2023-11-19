@@ -4,12 +4,12 @@ from os import path, chdir
 import inspect
 import sys
 
-# ------ настройка интерпритатора питон
+# ------ настройка интерпретатора питон
 sys.setrecursionlimit(5000)
 # ------ настройка путей для игры
 chdir(path.dirname(__file__))
 dragons_dir = path.join(path.dirname(__file__), 'dragons') # определяем путь до папки с картинками
-
+print("^^^^", dragons_dir )
 # ------ переменные настройки игры
 SPRITE_SIZE = 15
 WIDTH = 1024 # константа ширины окна игры
@@ -42,7 +42,7 @@ image_snow_old  = pygame.image.load("snow_old.png").convert()
 image_ded_moroz = pygame.image.load("ded_moroz.png").convert()
 image_enemy     = pygame.image.load("enemy.png").convert()
 image_hidden    = pygame.image.load( path.join(dragons_dir, "drakon4.jpg") ).convert()
-print("^^^^", path.join(dragons_dir, "drakon4.jpg") )
+print("*****", path.join(dragons_dir, "drakon4.jpg") )
 image_hidden    = pygame.transform.scale(image_hidden, (WIDTH, HEIGHT))
 image_hidden_rect = image_hidden.get_rect()
 
