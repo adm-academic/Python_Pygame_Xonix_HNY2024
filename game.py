@@ -1,8 +1,9 @@
+import sys
+import os
+sys.path.append( os.path.dirname(__file__) )
 import pygame
 import random
-import os
 import inspect
-import sys
 
 import settings
 import scene_play
