@@ -224,5 +224,4 @@ class Scene_Initial():
             self.update()
             self.draw()
 
-
             pygame.display.flip()
