@@ -1,12 +1,23 @@
 import sys
 import os
+
+import scene_finish
+
 sys.path.append( os.path.dirname(__file__) )
 import pygame
 import random
 import inspect
 
 import settings
+import player
+import level_loader
+import scene_initial
+import scene_levels
 import scene_play
+import scene_settings
+import scene_records
+import scene_new_player
+
 
 class Game():
     # допустимые сцены игры
@@ -15,9 +26,11 @@ class Game():
     SCENE_LEVELS   = 3
     SCENE_PLAY     = 4
     SCENE_FINISH   = 5
+    SCENE_RECORDS  = 6
+    SCENE_NEW_PLAYER = 7
     SCENE_EXIT     = 0
     def __init__(self):
-        self.scene_code = self.SCENE_INITIAL
+        self.code_of_scene = self.SCENE_INITIAL
         print("Инициализация PyGame...")
         # ------ настройка интерпретатора питон
         sys.setrecursionlimit(50000)
@@ -33,52 +46,93 @@ class Game():
         self.screen = pygame.display.set_mode((self.settings.WIDTH,  # создаём окно игры и получаем объект-поверхность
                                           self.settings.HEIGHT))
         self.clock = pygame.time.Clock()  # создаём объект "Часы" для контоля за временем и частотой в игре
-        self.pygame_font_name = pygame.font.match_font('arial')  # Получаем имя шрифта ближайшего к 'arial'
 
     def load_game(self):
         print("Старт загрузки игры Xonix HNY 2024...")
+        self.player = player.Player(self,self.settings)
+        self.scene_initial = scene_initial.Scene_Initial(self, self.settings)
+        self.scene_play = scene_play.Scene_Play(self, self.settings)
+        self.scene_settings = scene_settings.Scene_Settings(self, self.settings)
+        self.scene_levels = scene_levels.Scene_Levels(self, self.settings)
+        self.scene_finish = scene_finish.Scene_Finish(self, self.settings)
+        self.scene_records = scene_records.Scene_Records(self,self.settings)
+        self.scene_new_player = scene_new_player.Scene_New_Player(self,self.settings)
 
     def unload_game(self):
         print("Выгрузка игры...")
+
     def update(self):
         pass
+
     def draw(self):
         pass
 
     def exit_from_game(self):
-        self.scene_code = self.SCENE_EXIT
+        self.code_of_scene = self.SCENE_EXIT
+
+    def go_to_scene(self,scene_code):
+        self.scene_initial.unload_scene()
+        self.scene_settings.unload_scene()
+        self.scene_levels.unload_scene()
+        self.scene_play.unload_scene()
+        self.scene_finish.unload_scene()
+        self.scene_records.unload_scene()
+        self.scene_new_player.unload_scene()
+        pass
+        self.code_of_scene = scene_code
+        pass
 
     # функция отрисовки текста на поверхности
-    def draw_text(self, surf, text, size, x, y):
-        font = pygame.font.Font(self.pygame_font_name, size)  # создаём объект шрифта
-        text_surface = font.render(text, True, self.settings.WHITE)  # рендерим текст шрифтом и получаем поверхность
+    def draw_text(self, surf, text, size, x, y, color ):
+        font = pygame.font.Font(self.settings.pygame_font_name, size)  # создаём объект шрифта
+        text_surface = font.render(text, True, color )  # рендерим текст шрифтом и получаем поверхность
         text_rect = text_surface.get_rect()  # получаем прямоугольник поверхности
         text_rect.midtop = (x, y)  # модифициуют прямоугольник, размещая его по переданным x,y
         surf.blit(text_surface, text_rect)  # блиттинг отрендеренного текста на переданную поверхность
     def main_loops(self): # здесь запускаются главные циклы сцен
         print("Запускаю главные циклы сцен...")
         while True:
-            if   self.scene_code == self.SCENE_INITIAL:
+            if self.code_of_scene == self.SCENE_NEW_PLAYER:
+                self.scene_new_player.unload_scene()
+                self.scene_new_player.load_scene()
+                self.scene_new_player.scene_loop()
+            elif self.code_of_scene == self.SCENE_INITIAL:
+                self.scene_initial.unload_scene()
+                self.scene_initial.load_scene()
+                self.scene_initial.scene_loop()
                 pass
-            elif self.scene_code == self.SCENE_SETTINGS:
+            elif self.code_of_scene == self.SCENE_SETTINGS:
+                self.scene_settings.unload_scene()
+                self.scene_settings.load_scene()
+                self.scene_settings.scene_loop()
                 pass
-            elif self.scene_code == self.SCENE_LEVELS:
+            elif self.code_of_scene == self.SCENE_LEVELS:
+                self.scene_levels.unload_scene()
+                self.scene_levels.load_scene()
+                self.scene_levels.scene_loop()
                 pass
-            elif self.scene_code == self.SCENE_PLAY:
-                self.scene_play = scene_play.Scene_Play(self,self.settings)
+            elif self.code_of_scene == self.SCENE_PLAY:
+                self.scene_play.unload_scene()
+                self.scene_play.load_scene()
                 self.scene_play.scene_loop()
                 pass
-            elif self.scene_code == self.SCENE_FINISH:
+            elif self.code_of_scene == self.SCENE_RECORDS:
+                self.scene_records.unload_scene()
+                self.scene_records.load_scene()
+                self.scene_records.scene_loop()
+            elif self.code_of_scene == self.SCENE_FINISH:
+                self.scene_finish.unload_scene()
+                self.scene_finish.load_scene()
+                self.scene_finish.scene_loop()
                 pass
-            elif self.scene_code == self.SCENE_EXIT:
+            elif self.code_of_scene == self.SCENE_EXIT:
                 print("Выход из обработки игровых сцен...")
                 pygame.quit()
                 exit()
 
 
-
 game = Game()
 game.load_game()
-game.scene_code = game.SCENE_PLAY
+game.go_to_scene( game.SCENE_INITIAL )
 game.main_loops()
 game.unload_game()

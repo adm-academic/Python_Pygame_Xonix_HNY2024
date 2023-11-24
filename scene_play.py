@@ -1,6 +1,6 @@
 import pygame
 import random
-from os import path, chdir
+import os
 import inspect
 import sys
 
@@ -277,9 +277,9 @@ class Scene_Play():  # класс представляющий и управля
     def __init__(self,game, settings):  # констуктор
         self.game = game
         self.settings = settings
-        self.load_scene()
 
     def load_scene(self):  # код по инициализации и загрузке всей сцены....
+        print("Загружаю основную игровую сцену...")
         self.image_border = pygame.image.load("border.png").convert()
         self.image_snow = pygame.image.load("snow.png").convert()
         self.image_snow_crushed = pygame.image.load("snow_crushed.png").convert()
@@ -290,8 +290,8 @@ class Scene_Play():  # класс представляющий и управля
         self.player_win_in_this_scene = False
         self.REMAINING_PERCENTS_WIN = 15
         # ------ скрытая картинка для сцены
-        self.image_hidden = pygame.image.load(path.join(self.settings.DRAGONS_DIR, "drakon4.jpg")).convert()
-        print("*****", path.join(self.settings.DRAGONS_DIR, "drakon4.jpg"))
+        self.image_hidden = pygame.image.load(os.path.join(self.settings.DRAGONS_DIR, "drakon4.jpg")).convert()
+        print("*****", os.path.join(self.settings.DRAGONS_DIR, "drakon4.jpg"))
         self.image_hidden = pygame.transform.scale(self.image_hidden,
                                                    (self.settings.WIDTH, self.settings.HEIGHT))
         self.image_hidden_rect = self.image_hidden.get_rect()
@@ -366,18 +366,29 @@ class Scene_Play():  # класс представляющий и управля
 
     def unload_scene(self):
         self.blured_hidden_image = True
+        self.MATRIX_HEIGHT = 0
+        self.MATRIX_WIDTH = 0
         self.clear_colors()
         for iy in range(0, self.MATRIX_HEIGHT):
             for ix in range(0, self.MATRIX_WIDTH):
                 if self.sprites_matrix[iy][ix] != None:
                     self.sprites_matrix[iy][ix].kill()
                     self.sprites_matrix[iy][ix] = None
-        self.sprite_ded_moroz.y = 0
-        self.sprite_ded_moroz.x = self.settings.SPRITE_SIZE
-        self.all_sprites.remove(self.sprite_ded_moroz)
-        self.sprite_ded_moroz.kill()
-        self.enemy1.kill()
-        self.enemy2.kill()
+        if hasattr(self,'all_sprites') and self.all_sprites != None:
+            self.all_sprites.empty()
+        if hasattr(self,'snow_sprites') and self.snow_sprites != None:
+            self.snow_sprites.empty()
+        if hasattr(self,'crushed_sprites') and self.crushed_sprites != None:
+            self.crushed_sprites.empty()
+        if hasattr(self,'border_sprites') and self.border_sprites != None:
+            self.border_sprites.empty()
+        if hasattr(self,'enemy1') and self.enemy1 != None:
+            self.enemy1.kill()
+            self.enemy1 = None
+        if hasattr(self,'enemy2') and self.enemy2 != None:
+            self.enemy2.kill()
+            self.enemy2 = None
+        self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
 
     def reload_scene(self):
         self.unload_scene()
@@ -540,8 +551,9 @@ class Scene_Play():  # класс представляющий и управля
                 if event.type == pygame.QUIT:  # событие выхода из программы
                     self.game.exit_from_game()
                     return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_f:  # чит показывает фоновую картинку
-                    flip_image_hidden = not flip_image_hidden
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.game.go_to_scene(self.game.SCENE_INITIAL)
+                    return
 
             self.keyboard_processing()  # обрабатываем ввод для деда мороза
             self.move_auto()  # перемещает деда мороза по экрану
@@ -560,7 +572,8 @@ class Scene_Play():  # класс представляющий и управля
                     self.BLUR_RATIO = 1
                     self.blured_hidden_image = False
                 self.draw_hidden_image()  # выводим фоновую картинку
-                self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0)
+                self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0,
+                                    self.settings.WHITE )
                 self.draw_snow_fall()
 
             # После отрисовки всего, меняем экранные страницы #

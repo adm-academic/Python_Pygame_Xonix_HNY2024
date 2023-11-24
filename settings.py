@@ -1,4 +1,4 @@
-
+import pygame
 
 class Settings(): # класс хранящий все настройки игры
     def __init__( self ): # констуктор
@@ -11,6 +11,8 @@ class Settings(): # класс хранящий все настройки игр
         self.GREEN = (0, 255, 0)  # зелёный
         self.BLUE = (0, 0, 255)  # синий
         self.YELLOW = (255, 255, 0)  # жёлтый
+        self.GRAY = (100,100,100) # серый
+        self.ORANGE = (255,165,0)
         # ------ переменные настройки игры
         self.SPRITE_SIZE = 15  # размер спрайта игры
         self.FPS = 60  # частоты обновления кадров игры
@@ -18,3 +20,4 @@ class Settings(): # класс хранящий все настройки игр
         self.HEIGHT = 768  # высота окна игры
         self.WIDTH = (self.WIDTH // self.SPRITE_SIZE) * self.SPRITE_SIZE
         self.HEIGHT = (self.HEIGHT // self.SPRITE_SIZE) * self.SPRITE_SIZE
+        self.pygame_font_name = pygame.font.match_font('arial')  # Получаем имя шрифта ближайшего к 'arial'
