@@ -62,9 +62,10 @@ class Scene_Player_New():
                         return
                     if event.key == pygame.K_2:
                         new_pl_name = self.input_box_new_player_name.text
-                        self.game.player.create_new_player(new_pl_name)
-                        self.game.go_to_scene(self.game.SCENE_INITIAL)
-                        return
+                        if new_pl_name.strip() != "":
+                            self.game.player.create_new_player(new_pl_name)
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_position = pygame.mouse.get_pos()
@@ -73,9 +74,10 @@ class Scene_Player_New():
                         return
                     if self.button_confirm.rect.collidepoint(mouse_position):
                         new_pl_name = self.input_box_new_player_name.text
-                        self.game.player.create_new_player(new_pl_name)
-                        self.game.go_to_scene(self.game.SCENE_INITIAL)
-                        return
+                        if new_pl_name.strip() != "":
+                            self.game.player.create_new_player(new_pl_name)
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
 
                 self.input_box_new_player_name.handle_event(event)
 
