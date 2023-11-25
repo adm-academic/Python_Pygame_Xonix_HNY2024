@@ -3,6 +3,7 @@ import random
 import os
 import inspect
 import sys
+from adm_gui import *
 
 class Snow_Flake(pygame.sprite.Sprite):  # Класс спрайта "Снежинка"
     def __init__(self, scene_initial, settings ):  # констуктор
@@ -30,71 +31,6 @@ class Snow_Flake(pygame.sprite.Sprite):  # Класс спрайта "Снежи
             self.speedx = random.randrange(-3, 3)  #
             self.speedy = random.randrange(1, 8)  #
 
-
-class Menu_Button(pygame.sprite.Sprite):
-    def __init__(self, game, scene_initial, settings ):  # констуктор
-        pygame.sprite.Sprite.__init__(self)
-        self.game = game
-        self.scene_initial = scene_initial
-        self.settings = settings
-    def set_params(self, y_center,  # координата кнопки
-                   x_center,  # координата кнопки
-                   height,  # высота кнопки
-                   width,  # ширина кнопки
-                   hot_key,  # "горячая клавиша" кнопки, от 0 до 9
-                   text,  # текст, отобажаемый на кнопке
-                   ):
-        self.rect = pygame.Rect((0, 0), (width, height))
-        self.rect.centerx = x_center
-        self.rect.centery = y_center
-        self.hot_key = hot_key
-        self.text = text
-        self.is_over = False
-    def key_to_string(self,key):
-        if   key==pygame.K_0:
-            return "0"
-        elif key==pygame.K_1:
-            return "1"
-        elif key==pygame.K_2:
-            return "2"
-        elif key==pygame.K_3:
-            return "3"
-        elif key==pygame.K_4:
-            return "4"
-        elif key==pygame.K_5:
-            return "5"
-        elif key==pygame.K_6:
-            return "6"
-        elif key==pygame.K_7:
-            return "7"
-        elif key==pygame.K_8:
-            return "8"
-        elif key==pygame.K_9:
-            return "9"
-
-    def update(self):
-        pointer = pygame.mouse.get_pos()
-        if self.rect.collidepoint(pointer):  # if pointer is inside btnRect
-            self.is_over = True
-        else:
-            self.is_over = False
-    def draw(self, surface):
-        small_rect = self.rect.copy()
-        small_rect.width = self.rect.height
-        pygame.draw.rect( surface, self.settings.GRAY, self.rect )
-        pygame.draw.rect( surface, self.settings.YELLOW, small_rect )
-        if self.is_over:
-            pygame.draw.rect( surface, self.settings.YELLOW, self.rect, 8 )
-        self.game.draw_text(self.game.screen, self.key_to_string(self.hot_key), 50,
-                            small_rect.centerx,
-                            small_rect.top + 2,
-                            self.settings.BLUE )
-        self.game.draw_text(self.game.screen, self.text, 40,
-                            self.rect.centerx + small_rect.width // 2,
-                            small_rect.top + 6,
-                            self.settings.ORANGE)
-
-
 class Scene_Initial():
     def __init__(self, game, settings):  # констуктор
         self.game = game
@@ -109,31 +45,31 @@ class Scene_Initial():
         self.menu_buttons_group = pygame.sprite.Group()
         pass
         self.menu_button_player_new = Menu_Button(self.game, self, self.settings)
-        self.menu_button_player_new.set_params(150, self.settings.WIDTH // 2, 50, 500,
-                                        pygame.K_1, "Создать нового игрока.")
+        self.menu_button_player_new.set_params(250, self.settings.WIDTH // 2, 50, 400,
+                                        pygame.K_1, "Создать игрока.")
         self.menu_buttons_group.add(self.menu_button_player_new)
         pass
-        self.menu_button_new_game = Menu_Button(self.game, self, self.settings)
-        self.menu_button_new_game.set_params(250, self.settings.WIDTH // 2, 50, 500,
-                                             pygame.K_2, "Новая игра.")
-        self.menu_buttons_group.add(self.menu_button_new_game)
+        self.menu_button_player_select = Menu_Button(self.game, self, self.settings)
+        self.menu_button_player_select.set_params(320, self.settings.WIDTH // 2, 50, 400,
+                                                  pygame.K_2, "Выбрать игрока.")
+        self.menu_buttons_group.add(self.menu_button_player_select)
         pass
-        self.menu_button_continue = Menu_Button(self.game, self, self.settings)
-        self.menu_button_continue.set_params(350, self.settings.WIDTH // 2, 50, 500,
-                                        pygame.K_3, "Продолжить игру.")
-        self.menu_buttons_group.add(self.menu_button_continue)
+        self.menu_button_play = Menu_Button(self.game, self, self.settings)
+        self.menu_button_play.set_params(390, self.settings.WIDTH // 2, 50, 400,
+                                         pygame.K_3, "Играть.")
+        self.menu_buttons_group.add(self.menu_button_play)
         pass
         self.menu_button_settings = Menu_Button(self.game, self, self.settings)
-        self.menu_button_settings.set_params(450, self.settings.WIDTH // 2, 50, 500,
+        self.menu_button_settings.set_params(460, self.settings.WIDTH // 2, 50, 400,
                                         pygame.K_4, "Настройки.")
         self.menu_buttons_group.add(self.menu_button_settings)
         pass
         self.menu_button_records = Menu_Button(self.game, self, self.settings)
-        self.menu_button_records.set_params(550, self.settings.WIDTH // 2, 50, 500,
+        self.menu_button_records.set_params(530, self.settings.WIDTH // 2, 50, 400,
                                              pygame.K_5, "Рекорды.")
         self.menu_buttons_group.add(self.menu_button_records)
         self.menu_button_quit = Menu_Button(self.game, self, self.settings)
-        self.menu_button_quit.set_params(650, self.settings.WIDTH // 2, 50, 500,
+        self.menu_button_quit.set_params(600, self.settings.WIDTH // 2, 50, 400,
                                             pygame.K_6, "Выйти из игры.")
         self.menu_buttons_group.add(self.menu_button_quit)
         pass
@@ -156,7 +92,20 @@ class Scene_Initial():
     def unload_scene(self):
         self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
         self.image_backround = None
-        self.menu_button_new_game = None
+        self.image_backround_rect = None
+        self.menu_button_player_new = None
+        self.menu_button_player_select = None
+        self.menu_button_play = None
+        self.menu_button_settings = None
+        self.menu_button_records = None
+        self.menu_button_quit = None
+        if hasattr(self, 'snow_flakes_list') and \
+            self.snow_flakes_list != None:
+            for sf in self.snow_flakes_list:
+                del sf
+            self.snow_flakes_list.clear()
+            self.snow_flakes_list = None
+        self.spruce = None
         pass
     def reload_scene(self):
         pass
@@ -182,13 +131,13 @@ class Scene_Initial():
                     return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_1:
-                        self.game.go_to_scene(self.game.SCENE_NEW_PLAYER)
+                        self.game.go_to_scene(self.game.SCENE_PLAYER_NEW)
                         return
                     if event.key == pygame.K_2:
-                        self.game.go_to_scene(self.game.SCENE_PLAY)
+                        self.game.go_to_scene(self.game.SCENE_PLAYER_SELECT)
                         return
                     if event.key == pygame.K_3:
-                        self.game.go_to_scene(self.game.SCENE_LEVELS)
+                        self.game.go_to_scene(self.game.SCENE_PLAY)
                         return
                     if event.key == pygame.K_4:
                         self.game.go_to_scene(self.game.SCENE_SETTINGS)
@@ -203,13 +152,13 @@ class Scene_Initial():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_position = pygame.mouse.get_pos()
                     if self.menu_button_player_new.rect.collidepoint(mouse_position):
-                        self.game.go_to_scene(self.game.SCENE_NEW_PLAYER)
+                        self.game.go_to_scene(self.game.SCENE_PLAYER_NEW)
                         return
-                    if self.menu_button_new_game.rect.collidepoint(mouse_position):
+                    if self.menu_button_player_select.rect.collidepoint(mouse_position):
+                        self.game.go_to_scene(self.game.SCENE_PLAYER_SELECT)
+                        return
+                    elif self.menu_button_play.rect.collidepoint(mouse_position):
                         self.game.go_to_scene(self.game.SCENE_PLAY)
-                        return
-                    elif self.menu_button_continue.rect.collidepoint(mouse_position):
-                        self.game.go_to_scene(self.game.SCENE_LEVELS)
                         return
                     elif self.menu_button_settings.rect.collidepoint(mouse_position):
                         self.game.go_to_scene(self.game.SCENE_SETTINGS)
@@ -223,5 +172,9 @@ class Scene_Initial():
 
             self.update()
             self.draw()
+            self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
+                                self.settings.WIDTH // 2,
+                                20,
+                                self.settings.GREEN)
 
             pygame.display.flip()

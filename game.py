@@ -16,19 +16,21 @@ import scene_levels
 import scene_play
 import scene_settings
 import scene_records
-import scene_new_player
+import scene_player_new
+import scene_player_select
 
 
 class Game():
     # допустимые сцены игры
-    SCENE_INITIAL  = 1
-    SCENE_SETTINGS = 2
-    SCENE_LEVELS   = 3
-    SCENE_PLAY     = 4
-    SCENE_FINISH   = 5
-    SCENE_RECORDS  = 6
-    SCENE_NEW_PLAYER = 7
-    SCENE_EXIT     = 0
+    SCENE_INITIAL     = 1
+    SCENE_SETTINGS    = 2
+    SCENE_LEVELS      = 3
+    SCENE_PLAY        = 4
+    SCENE_FINISH      = 5
+    SCENE_RECORDS     = 6
+    SCENE_PLAYER_NEW  = 7
+    SCENE_PLAYER_SELECT = 8
+    SCENE_EXIT        = 0
     def __init__(self):
         self.code_of_scene = self.SCENE_INITIAL
         print("Инициализация PyGame...")
@@ -50,13 +52,15 @@ class Game():
     def load_game(self):
         print("Старт загрузки игры Xonix HNY 2024...")
         self.player = player.Player(self,self.settings)
+        self.level_loader = level_loader.Level_Loader(self,self.settings)
         self.scene_initial = scene_initial.Scene_Initial(self, self.settings)
         self.scene_play = scene_play.Scene_Play(self, self.settings)
         self.scene_settings = scene_settings.Scene_Settings(self, self.settings)
         self.scene_levels = scene_levels.Scene_Levels(self, self.settings)
         self.scene_finish = scene_finish.Scene_Finish(self, self.settings)
         self.scene_records = scene_records.Scene_Records(self,self.settings)
-        self.scene_new_player = scene_new_player.Scene_New_Player(self,self.settings)
+        self.scene_player_new = scene_player_new.Scene_Player_New(self, self.settings)
+        self.scene_player_select = scene_player_select.Scene_Player_Select(self,self.settings)
 
     def unload_game(self):
         print("Выгрузка игры...")
@@ -77,7 +81,7 @@ class Game():
         self.scene_play.unload_scene()
         self.scene_finish.unload_scene()
         self.scene_records.unload_scene()
-        self.scene_new_player.unload_scene()
+        self.scene_player_new.unload_scene()
         pass
         self.code_of_scene = scene_code
         pass
@@ -92,10 +96,14 @@ class Game():
     def main_loops(self): # здесь запускаются главные циклы сцен
         print("Запускаю главные циклы сцен...")
         while True:
-            if self.code_of_scene == self.SCENE_NEW_PLAYER:
-                self.scene_new_player.unload_scene()
-                self.scene_new_player.load_scene()
-                self.scene_new_player.scene_loop()
+            if self.code_of_scene == self.SCENE_PLAYER_NEW:
+                self.scene_player_new.unload_scene()
+                self.scene_player_new.load_scene()
+                self.scene_player_new.scene_loop()
+            elif self.code_of_scene == self.SCENE_PLAYER_SELECT:
+                self.scene_player_select.unload_scene()
+                self.scene_player_select.load_scene()
+                self.scene_player_select.scene_loop()
             elif self.code_of_scene == self.SCENE_INITIAL:
                 self.scene_initial.unload_scene()
                 self.scene_initial.load_scene()
@@ -129,6 +137,8 @@ class Game():
                 print("Выход из обработки игровых сцен...")
                 pygame.quit()
                 exit()
+            else:
+                pygame.time.delay(300)
 
 
 game = Game()

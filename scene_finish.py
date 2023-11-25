@@ -16,6 +16,10 @@ class Scene_Finish():
         pass
     def reload_scene(self):
         pass
+    def update(self):
+        pass
+    def draw(self):
+        pass
     def scene_loop(self):
         while True:
             self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
@@ -26,9 +30,13 @@ class Scene_Finish():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.game.go_to_scene(self.game.SCENE_INITIAL)
                     return
+
+            self.update()
+            self.draw()
+
             self.game.draw_text (self.game.screen, "Сцена финиша игры !", 72,
                                  self.settings.WIDTH // 2,
                                  self.settings.HEIGHT // 2,
-                                 self.settings.WHITE )
+                                 self.settings.GREEN )
 
             pygame.display.flip()
