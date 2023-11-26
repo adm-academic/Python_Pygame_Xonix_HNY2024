@@ -59,4 +59,4 @@ class Settings(): # класс хранящий все настройки игр
         return self.KV_get_value("player_last_name")
 
     def set_player_last_name(self, name):
-        self.KV_get_value("player_last_name",name)
+        self.KV_set_value("player_last_name", name )

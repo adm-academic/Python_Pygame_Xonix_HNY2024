@@ -68,6 +68,39 @@ class Menu_Button(pygame.sprite.Sprite):
                             small_rect.top + 6,
                             self.settings.ORANGE)
 
+class Player_Button(pygame.sprite.Sprite):
+    def __init__(self, game, scene_player_select, settings):  # констуктор
+        pygame.sprite.Sprite.__init__(self)
+        self.game = game
+        self.scene_player_select = scene_player_select
+        self.settings = settings
+    def set_params(self, y_top,  # координата кнопки
+                   x_left,  # координата кнопки
+                   height,  # высота кнопки
+                   width,  # ширина кнопки
+                   text,  # текст, отобажаемый на кнопке
+                   ):
+        self.rect = pygame.Rect((0, 0), (width, height))
+        self.rect.left = x_left
+        self.rect.top = y_top
+        self.text = text
+        self.is_over = False
+    def update(self):
+        pointer = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pointer):  # if pointer is inside btnRect
+            self.is_over = True
+        else:
+            self.is_over = False
+    def draw(self, surface):
+        pygame.draw.rect( surface, self.settings.GRAY, self.rect )
+        if self.is_over:
+            pygame.draw.rect( surface, self.settings.YELLOW, self.rect, 8 )
+        self.game.draw_text(self.game.screen, self.text, 40,
+                            self.rect.x + self.rect.width  // 2,
+                            self.rect.top,
+                            self.settings.ORANGE)
+
+
 class InputBox:
     def __init__(self,game,settings, x, y, w, h, text=''):
         self.game = game

@@ -13,9 +13,9 @@ class Player():
         self.registration_date = None
         self.last_name = self.settings.get_player_last_name()
         if self.in_db_alreay_exists(self.last_name):
-            self.read_from_db( self.last_name )
+            self.load_from_db(self.last_name)
 
-    def read_from_db(self,name): # читает параметры в объект из БД по указанному имени
+    def load_from_db(self, name): # читает параметры в объект из БД по указанному имени
         query_get = " select * from Player where name='%s'; " % ( name )
         cursor = self.settings.db_connection.cursor()
         cursor.execute( query_get )
@@ -26,6 +26,8 @@ class Player():
         self.name = row[1]
         self.score = row[2]
         self.registration_date = row[3]
+        print("####", self.name )
+        self.settings.set_player_last_name( self.name )
 
     def in_db_alreay_exists(self,name): # возвращает истину если игрок с таким именем уже есть в таблице БД
         query_check = " select * from Player where name='%s'; " % ( name )
@@ -46,12 +48,12 @@ class Player():
 
     def create_new_player(self,name):
         if self.in_db_alreay_exists(name):
-            self.read_from_db(name)
+            self.load_from_db(name)
             return
         query_create_new = "insert into Player(name,score,registration_date) " + \
                               "values ('%s',0,datetime('now','localtime')); " %name
         cursor = self.settings.db_connection.cursor()
         cursor.execute(query_create_new)
         self.settings.db_connection.commit()
-        self.read_from_db(name)
+        self.load_from_db(name)
 
