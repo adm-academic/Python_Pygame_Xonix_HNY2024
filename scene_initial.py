@@ -158,7 +158,7 @@ class Scene_Initial():
                         self.game.go_to_scene(self.game.SCENE_PLAYER_SELECT)
                         return
                     elif self.menu_button_play.rect.collidepoint(mouse_position):
-                        self.game.go_to_scene(self.game.SCENE_PLAY)
+                        self.game.go_to_scene(self.game.SCENE_LEVELS)
                         return
                     elif self.menu_button_settings.rect.collidepoint(mouse_position):
                         self.game.go_to_scene(self.game.SCENE_SETTINGS)

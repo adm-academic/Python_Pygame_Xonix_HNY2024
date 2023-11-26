@@ -84,7 +84,8 @@ class Scene_Player_Select():
                         for button in self.buttons_players:
                             if button.rect.collidepoint(mouse_position):
                                 self.game.player.load_from_db( button.text )
-                                pass
+                                self.game.go_to_scene(self.game.SCENE_INITIAL)
+                                return
 
                 self.update()
                 self.draw()

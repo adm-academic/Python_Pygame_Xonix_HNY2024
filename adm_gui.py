@@ -152,3 +152,93 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
+
+
+class Level_Button(pygame.sprite.Sprite):
+    # кнопки уровней я решил сделать "умными", они сами "ходят" БД и сами
+    # находят картинки. сами отрисовываются. Им нужны только координаты left-top
+    # и номер уровня, который должна отображать кнопка
+    def __init__(self, game, scene, settings):  # констуктор
+        pygame.sprite.Sprite.__init__(self)
+        self.game = game
+        self.scene = scene
+        self.settings = settings
+    def set_params(self,
+                   y_top,  # координата кнопки
+                   x_left,  # координата кнопки
+                   height,
+                   width,
+                   level_number  # номер уровня, открываемый кнопкой
+                   ):
+        self.rect = pygame.Rect((0, 0), (width, height))
+        self.rect.left = x_left
+        self.rect.top = y_top
+        self.rect.width = width
+        self.rect.height = height
+        self.level_number = level_number
+        self.allowed = True
+        self.is_over = False
+        self.lock_image = pygame.image.load( os.path.join( "levels", "lock.png") ).convert()
+        self.lock_image.set_colorkey(self.settings.BLACK)
+        self.lock_image = pygame.transform.scale(self.lock_image,
+                                                (self.rect.width, self.rect.height))
+        self.read_from_db()
+    def read_from_db(self):
+        query_level = """   select  p.id player_id, p.name name,
+                                    cl.score score, 
+                                    pl.id level_id, pl.backround_image image
+                            from    Player p left outer join  
+                                    Completed_Level cl on p.id = cl.player_id left outer join
+                                    Possible_Level pl ON cl.possible_level_id = pl.id 
+                            WHERE   p.id  = %s and
+	                                pl.id = %s 
+                     """ % ( self.game.player.id, self.level_number )
+        cursor = self.settings.db_connection.cursor()
+        cursor.execute(query_level)
+        rows = cursor.fetchall()
+        if len(rows)  <= 0:
+            if self.level_number == 1:
+                self.allowed = True
+                image_path = os.path.join("levels", "dragon1.jpg")
+                self.level_image = pygame.image.load(image_path).convert()
+                self.level_image = pygame.transform.scale(self.level_image,
+                                                          (self.rect.width, self.rect.height))
+            else:
+                self.allowed = False
+            return
+        elif len(rows) == 1:
+            for row in rows:
+                self.allowed = True
+                image_path = os.path.join( "levels", row[4] )
+                self.level_image = pygame.image.load( image_path ).convert()
+                self.level_image = pygame.transform.scale(self.level_image,
+                                                          (self.rect.width, self.rect.height))
+                return
+        else:
+            self.allowed = False
+            print("ERROR! Rows must be 1 ONE !!!! ")
+            return
+    def update(self):
+        pointer = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pointer):  # if pointer is inside btnRect
+            self.is_over = True
+        else:
+            self.is_over = False
+    def draw(self, surface):
+        image_rect = self.rect.copy()
+        image_rect.x -= 4
+        image_rect.y -= 4
+        image_rect.width += 8
+        image_rect.height += 8
+        pygame.draw.rect(surface, self.settings.GRAY, image_rect)
+        if self.allowed:
+            self.game.screen.blit(self.level_image, self.rect)
+        else:
+            self.game.screen.blit(self.lock_image, self.rect)
+        pygame.draw.rect(surface, self.settings.BLACK, self.rect, 5)
+        if self.is_over:
+            pygame.draw.rect(surface, self.settings.YELLOW, self.rect, 8)
+        self.game.draw_text_center(self.game.screen, str(self.level_number), 50,
+                            self.rect.centerx ,
+                            self.rect.centery,
+                            self.settings.RED)

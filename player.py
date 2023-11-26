@@ -23,6 +23,7 @@ class Player():
         if len(rows) <=0:
             return
         row = rows[0]
+        self.id = row[0]
         self.name = row[1]
         self.score = row[2]
         self.registration_date = row[3]
