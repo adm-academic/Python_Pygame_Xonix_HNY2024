@@ -47,47 +47,52 @@ class Scene_Player_New():
     def create_player(self,player_name):
         pass
     def scene_loop(self):
-        while True:
-            self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
-            for event in pygame.event.get():  # перебираем все поступившие события
-                if event.type == pygame.QUIT:  # событие выхода из программы
-                    self.game.exit_from_game()
-                    return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.game.go_to_scene(self.game.SCENE_INITIAL)
-                    return
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
+        try:
+            while True:
+                self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
+                for event in pygame.event.get():  # перебираем все поступившие события
+                    if event.type == pygame.QUIT:  # событие выхода из программы
+                        self.game.exit_from_game()
+                        return
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         self.game.go_to_scene(self.game.SCENE_INITIAL)
                         return
-                    if event.key == pygame.K_2:
-                        new_pl_name = self.input_box_new_player_name.text
-                        if new_pl_name.strip() != "":
-                            self.game.player.create_new_player(new_pl_name)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_1:
                             self.game.go_to_scene(self.game.SCENE_INITIAL)
                             return
+                        if event.key == pygame.K_2:
+                            new_pl_name = self.input_box_new_player_name.text
+                            if new_pl_name.strip() != "":
+                                self.game.player.create_new_player(new_pl_name)
+                                self.game.go_to_scene(self.game.SCENE_INITIAL)
+                                return
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_position = pygame.mouse.get_pos()
-                    if self.button_cancel.rect.collidepoint(mouse_position):
-                        self.game.go_to_scene(self.game.SCENE_INITIAL)
-                        return
-                    if self.button_confirm.rect.collidepoint(mouse_position):
-                        new_pl_name = self.input_box_new_player_name.text
-                        if new_pl_name.strip() != "":
-                            self.game.player.create_new_player(new_pl_name)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_position = pygame.mouse.get_pos()
+                        if self.button_cancel.rect.collidepoint(mouse_position):
                             self.game.go_to_scene(self.game.SCENE_INITIAL)
                             return
+                        if self.button_confirm.rect.collidepoint(mouse_position):
+                            new_pl_name = self.input_box_new_player_name.text
+                            if new_pl_name.strip() != "":
+                                self.game.player.create_new_player(new_pl_name)
+                                self.game.go_to_scene(self.game.SCENE_INITIAL)
+                                return
 
-                self.input_box_new_player_name.handle_event(event)
+                    self.input_box_new_player_name.handle_event(event)
 
-            self.update()
+                self.update()
 
-            self.draw()
+                self.draw()
 
-            self.game.draw_text(self.game.screen, "Регистрируем нового игрока", 60,
-                                self.settings.WIDTH // 2,
-                                0,
-                                self.settings.GREEN)
+                self.game.draw_text(self.game.screen, "Регистрируем нового игрока", 40,
+                                    self.settings.WIDTH // 2,
+                                    0,
+                                    self.settings.GREEN)
 
-            pygame.display.flip()
+                pygame.display.flip()
+        except Exception as e:
+            print(e)
+            self.game.go_to_scene(self.game.SCENE_INITIAL)
+            return

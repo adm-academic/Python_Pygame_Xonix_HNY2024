@@ -17,7 +17,7 @@ CREATE table if not exists  Possible_Level(
 
 
 
-CREATE table if not exists Completed_Levels(
+CREATE table if not exists Completed_Level(
 	player_id int not null,
 	possible_level_id int not null,
 	score int,

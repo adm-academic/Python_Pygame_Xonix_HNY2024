@@ -25,22 +25,27 @@ class Scene_Levels():
     def draw(self):
         self.game.screen.blit(self.image_backround, self.image_backround_rect)
     def scene_loop(self):
-        while True:
-            self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
-            for event in pygame.event.get():  # перебираем все поступившие события
-                if event.type == pygame.QUIT:  # событие выхода из программы
-                    self.game.exit_from_game()
-                    return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.game.go_to_scene(self.game.SCENE_INITIAL)
-                    return
+        try:
+            while True:
+                self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
+                for event in pygame.event.get():  # перебираем все поступившие события
+                    if event.type == pygame.QUIT:  # событие выхода из программы
+                        self.game.exit_from_game()
+                        return
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        self.game.go_to_scene(self.game.SCENE_INITIAL)
+                        return
 
-            self.update()
-            self.draw()
+                self.update()
+                self.draw()
 
-            self.game.draw_text (self.game.screen, "Сцена выбора уровней.", 72,
-                                 self.settings.WIDTH // 2,
-                                 self.settings.HEIGHT // 2 ,
-                                 self.settings.GREEN)
+                self.game.draw_text (self.game.screen, "Сцена выбора уровней.", 40,
+                                     self.settings.WIDTH // 2,
+                                     0 ,
+                                     self.settings.GREEN)
 
-            pygame.display.flip()
+                pygame.display.flip()
+        except Exception as e:
+            print(e)
+            self.game.go_to_scene(self.game.SCENE_INITIAL)
+            return

@@ -220,7 +220,7 @@ class Enemy(pygame.sprite.Sprite):
         self.dx = 1 * self.settings.SPRITE_SIZE
         self.dy = 1 * self.settings.SPRITE_SIZE
         pass
-        self.speed_delay = 50
+        self.speed_delay = 100
         self.speed_timer = pygame.time.get_ticks()  # сохраним временную засечку для скорости перемещения врагов
         pass
 
@@ -545,36 +545,41 @@ class Scene_Play():  # класс представляющий и управля
         pass
 
     def scene_loop(self):
-        while True:
-            self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
-            for event in pygame.event.get():  # перебираем все поступившие события
-                if event.type == pygame.QUIT:  # событие выхода из программы
-                    self.game.exit_from_game()
-                    return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.game.go_to_scene(self.game.SCENE_INITIAL)
-                    return
+        try:
+            while True:
+                self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
+                for event in pygame.event.get():  # перебираем все поступившие события
+                    if event.type == pygame.QUIT:  # событие выхода из программы
+                        self.game.exit_from_game()
+                        return
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        self.game.go_to_scene(self.game.SCENE_INITIAL)
+                        return
 
-            self.keyboard_processing()  # обрабатываем ввод для деда мороза
-            self.move_auto()  # перемещает деда мороза по экрану
+                self.keyboard_processing()  # обрабатываем ввод для деда мороза
+                self.move_auto()  # перемещает деда мороза по экрану
 
-            self.update()  # вызыает метод update для спрайтов всей сцены
+                self.update()  # вызыает метод update для спрайтов всей сцены
 
-            # Рендеринг сцены
-            self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
-            if not self.player_win_in_this_scene:
+                # Рендеринг сцены
+                self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
+                if not self.player_win_in_this_scene:
+                        self.draw_hidden_image()  # выводим фоновую картинку
+                        self.all_sprites.draw(self.game.screen)  # отрисовываем все спрайты встроенной функцией pygame
+                elif self.player_win_in_this_scene:
+                    if self.BLUR_RATIO > 1:
+                        self.BLUR_RATIO -= 0.40
+                    if self.BLUR_RATIO <= 1:
+                        self.BLUR_RATIO = 1
+                        self.blured_hidden_image = False
                     self.draw_hidden_image()  # выводим фоновую картинку
-                    self.all_sprites.draw(self.game.screen)  # отрисовываем все спрайты встроенной функцией pygame
-            elif self.player_win_in_this_scene:
-                if self.BLUR_RATIO > 1:
-                    self.BLUR_RATIO -= 0.40
-                if self.BLUR_RATIO <= 1:
-                    self.BLUR_RATIO = 1
-                    self.blured_hidden_image = False
-                self.draw_hidden_image()  # выводим фоновую картинку
-                self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0,
-                                    self.settings.WHITE )
-                self.draw_snow_fall()
+                    self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0,
+                                        self.settings.WHITE )
+                    self.draw_snow_fall()
 
-            # После отрисовки всего, меняем экранные страницы #
-            pygame.display.flip()
+                # После отрисовки всего, меняем экранные страницы #
+                pygame.display.flip()
+        except Exception as e:
+            print(e)
+            self.game.go_to_scene(self.game.SCENE_INITIAL)
+            return

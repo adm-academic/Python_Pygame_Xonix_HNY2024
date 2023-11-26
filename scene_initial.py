@@ -137,7 +137,7 @@ class Scene_Initial():
                         self.game.go_to_scene(self.game.SCENE_PLAYER_SELECT)
                         return
                     if event.key == pygame.K_3:
-                        self.game.go_to_scene(self.game.SCENE_PLAY)
+                        self.game.go_to_scene(self.game.SCENE_LEVELS)
                         return
                     if event.key == pygame.K_4:
                         self.game.go_to_scene(self.game.SCENE_SETTINGS)

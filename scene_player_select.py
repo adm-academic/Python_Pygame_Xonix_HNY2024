@@ -62,39 +62,44 @@ class Scene_Player_Select():
         for btn in self.buttons_players:
             btn.draw( self.game.screen )
     def scene_loop(self):
-        while True:
-            self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
-            for event in pygame.event.get():  # перебираем все поступившие события
-                if event.type == pygame.QUIT:  # событие выхода из программы
-                    self.game.exit_from_game()
-                    return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    self.game.go_to_scene(self.game.SCENE_INITIAL)
-                    return
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
+        try:
+            while True:
+                self.game.clock.tick(self.settings.FPS)  # задаём кадры в секунду
+                for event in pygame.event.get():  # перебираем все поступившие события
+                    if event.type == pygame.QUIT:  # событие выхода из программы
+                        self.game.exit_from_game()
+                        return
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         self.game.go_to_scene(self.game.SCENE_INITIAL)
                         return
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_position = pygame.mouse.get_pos()
-                    if self.button_cancel.rect.collidepoint(mouse_position):
-                        self.game.go_to_scene(self.game.SCENE_INITIAL)
-                        return
-                    for button in self.buttons_players:
-                        if button.rect.collidepoint(mouse_position):
-                            self.game.player.load_from_db( button.text )
-                            pass
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_1:
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_position = pygame.mouse.get_pos()
+                        if self.button_cancel.rect.collidepoint(mouse_position):
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
+                        for button in self.buttons_players:
+                            if button.rect.collidepoint(mouse_position):
+                                self.game.player.load_from_db( button.text )
+                                pass
 
-            self.update()
-            self.draw()
+                self.update()
+                self.draw()
 
-            self.game.draw_text(self.game.screen, "Выбираем имеющегося игрока.", 40,
-                                self.settings.WIDTH // 2,
-                                0,
-                                self.settings.GREEN)
-            self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
-                                self.settings.WIDTH // 2,
-                                50,
-                                self.settings.GREEN)
+                self.game.draw_text(self.game.screen, "Выбираем имеющегося игрока.", 40,
+                                    self.settings.WIDTH // 2,
+                                    0,
+                                    self.settings.GREEN)
+                self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
+                                    self.settings.WIDTH // 2,
+                                    50,
+                                    self.settings.GREEN)
 
-            pygame.display.flip()
+                pygame.display.flip()
+        except Exception as e:
+            print(e)
+            self.game.go_to_scene(self.game.SCENE_INITIAL)
+            return
