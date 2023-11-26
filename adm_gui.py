@@ -6,10 +6,10 @@ import sys
 
 
 class Menu_Button(pygame.sprite.Sprite):
-    def __init__(self, game, scene_initial, settings ):  # констуктор
+    def __init__(self, game, scene, settings ):  # констуктор
         pygame.sprite.Sprite.__init__(self)
         self.game = game
-        self.scene_initial = scene_initial
+        self.scene = scene
         self.settings = settings
     def set_params(self, y_center,  # координата кнопки
                    x_center,  # координата кнопки
@@ -69,12 +69,13 @@ class Menu_Button(pygame.sprite.Sprite):
                             self.settings.ORANGE)
 
 class Player_Button(pygame.sprite.Sprite):
-    def __init__(self, game, scene_player_select, settings):  # констуктор
+    def __init__(self, game, scene, settings):  # констуктор
         pygame.sprite.Sprite.__init__(self)
         self.game = game
-        self.scene_player_select = scene_player_select
+        self.scene = scene
         self.settings = settings
-    def set_params(self, y_top,  # координата кнопки
+    def set_params(self,
+                   y_top,  # координата кнопки
                    x_left,  # координата кнопки
                    height,  # высота кнопки
                    width,  # ширина кнопки
@@ -92,12 +93,20 @@ class Player_Button(pygame.sprite.Sprite):
         else:
             self.is_over = False
     def draw(self, surface):
-        pygame.draw.rect( surface, self.settings.GRAY, self.rect )
+        small_rect = self.rect.copy()
+        small_rect.width = self.rect.height
+        small_rect.x = self.rect.right - small_rect.width
+        pygame.draw.rect(surface, self.settings.GRAY, self.rect)
+        #pygame.draw.rect(surface, self.settings.BLUE, small_rect)
         if self.is_over:
-            pygame.draw.rect( surface, self.settings.YELLOW, self.rect, 8 )
+            pygame.draw.rect(surface, self.settings.YELLOW, self.rect, 8)
+        #self.game.draw_text(self.game.screen, "X", 50,
+        #                    small_rect.centerx,
+        #                    small_rect.top + 2,
+        #                    self.settings.WHITE)
         self.game.draw_text(self.game.screen, self.text, 40,
-                            self.rect.x + self.rect.width  // 2,
-                            self.rect.top,
+                            self.rect.centerx ,
+                            small_rect.top + 6,
                             self.settings.ORANGE)
 
 
