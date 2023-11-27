@@ -594,6 +594,6 @@ class Scene_Play():  # класс представляющий и управля
                 # После отрисовки всего, меняем экранные страницы #
                 pygame.display.flip()
         except Exception as e:
-            print(e)
+            print('EXCEPTION: ', e)
             self.game.go_to_scene(self.game.SCENE_INITIAL)
             return

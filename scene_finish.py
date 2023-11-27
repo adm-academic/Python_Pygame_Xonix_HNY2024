@@ -10,6 +10,12 @@ class Scene_Finish():
         self.settings = settings
         pass
     def load_scene(self):
+        self.image_backround = pygame.image.load("images/final/final_0.gif").convert()
+        self.image_backround = pygame.transform.scale(self.image_backround,
+                                                      (self.settings.WIDTH, self.settings.HEIGHT))
+        self.image_backround_rect = self.image_backround.get_rect()
+        self.animation_count = 0
+        self.ANIMATION_MAX = 14
         pass
     def unload_scene(self):
         self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
@@ -17,8 +23,17 @@ class Scene_Finish():
     def reload_scene(self):
         pass
     def update(self):
+        self.animation_count += 1
+        if self.animation_count > self.ANIMATION_MAX:
+            self.animation_count = 0
+        self.image_backround = pygame.image.load("images/final/final_" +
+                                                 str(self.animation_count) + ".gif").convert()
+        self.image_backround = pygame.transform.scale(self.image_backround,
+                                                      (self.settings.WIDTH, self.settings.HEIGHT))
+        self.image_backround_rect = self.image_backround.get_rect()
         pass
     def draw(self):
+        self.game.screen.blit(self.image_backround, self.image_backround_rect)
         pass
     def scene_loop(self):
         try:
@@ -35,14 +50,9 @@ class Scene_Finish():
                 self.update()
                 self.draw()
 
-                self.game.draw_text (self.game.screen, "Сцена финиша игры !", 72,
-                                     self.settings.WIDTH // 2,
-                                     self.settings.HEIGHT // 2,
-                                     self.settings.GREEN )
-
                 pygame.display.flip()
 
         except Exception as e:
-            print(e)
+            print('EXCEPTION: ', e)
             self.game.go_to_scene(self.game.SCENE_INITIAL)
             return

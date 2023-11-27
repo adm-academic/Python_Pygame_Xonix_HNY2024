@@ -22,9 +22,9 @@ class Scene_Levels():
         pass
         self.buttons_levels = pygame.sprite.Group()
         idx = 1
-        b_width = 180
-        b_height = 135
-        b_horizontal_space = 25
+        b_width = 160
+        b_height = 120
+        b_horizontal_space = 45
         b_vertical_space = 15
         b_x_start = 130
         b_y_start = 170
@@ -98,6 +98,6 @@ class Scene_Levels():
 
                 pygame.display.flip()
         except Exception as e:
-            print(e)
+            print('EXCEPTION: ', e)
             self.game.go_to_scene(self.game.SCENE_INITIAL)
             return
