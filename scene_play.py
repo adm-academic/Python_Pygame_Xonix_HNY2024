@@ -278,6 +278,17 @@ class Scene_Play():  # класс представляющий и управля
         self.game = game
         self.settings = settings
 
+    def load_image_hidden(self,filename):
+        # ------ скрытая картинка для сцены
+        # os.path.join( self.settings.DRAGONS_DIR, "drakon4.jpg" )
+        self.image_hidden = pygame.image.load( filename ).convert()
+        print("*****", filename )
+        self.image_hidden = pygame.transform.scale(self.image_hidden,
+                                                   (self.settings.WIDTH, self.settings.HEIGHT))
+        self.image_hidden_rect = self.image_hidden.get_rect()
+        self.BLUR_RATIO = 50.0
+        self.blured_hidden_image = True
+
     def load_scene(self):  # код по инициализации и загрузке всей сцены....
         print("Загружаю основную игровую сцену...")
         self.image_border = pygame.image.load("border.png").convert()
@@ -290,13 +301,7 @@ class Scene_Play():  # класс представляющий и управля
         self.player_win_in_this_scene = False
         self.REMAINING_PERCENTS_WIN = 15
         # ------ скрытая картинка для сцены
-        self.image_hidden = pygame.image.load(os.path.join(self.settings.DRAGONS_DIR, "drakon4.jpg")).convert()
-        print("*****", os.path.join(self.settings.DRAGONS_DIR, "drakon4.jpg"))
-        self.image_hidden = pygame.transform.scale(self.image_hidden,
-                                                   (self.settings.WIDTH, self.settings.HEIGHT))
-        self.image_hidden_rect = self.image_hidden.get_rect()
-        self.BLUR_RATIO = 50.0
-        self.blured_hidden_image = True
+        self.load_image_hidden(os.path.join( "levels", self.game.level_load_info.image_filename))
         # ------ инициализация матрицы спрайтов
         self.MATRIX_WIDTH = self.settings.WIDTH // self.settings.SPRITE_SIZE
         self.MATRIX_HEIGHT = self.settings.HEIGHT // self.settings.SPRITE_SIZE
@@ -397,6 +402,8 @@ class Scene_Play():  # класс представляющий и управля
     def player_win_scene(self):
         self.unload_scene()
         self.player_win_in_this_scene = True
+        self.game.level_load_info.player_win_in_level_write_to_db(
+            self.game.level_load_info.level_id, 0)
         print("!!!!!!!!!! PLAYER WIN !!!!!!!!!!!!!!")
 
     def player_lose_scene(self):
@@ -553,8 +560,13 @@ class Scene_Play():  # класс представляющий и управля
                         self.game.exit_from_game()
                         return
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                        self.game.go_to_scene(self.game.SCENE_INITIAL)
+                        self.game.go_to_scene(self.game.SCENE_LEVELS)
                         return
+                    if event.type == pygame.KEYDOWN:
+                        if self.player_win_in_this_scene==True and \
+                           self.blured_hidden_image==False:
+                           self.game.go_to_scene(self.game.SCENE_LEVELS)
+                           return
 
                 self.keyboard_processing()  # обрабатываем ввод для деда мороза
                 self.move_auto()  # перемещает деда мороза по экрану
@@ -575,6 +587,8 @@ class Scene_Play():  # класс представляющий и управля
                     self.draw_hidden_image()  # выводим фоновую картинку
                     self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0,
                                         self.settings.WHITE )
+                    self.game.draw_text(self.game.screen, "Нажмите любую клавишу ! ", 72, self.settings.WIDTH // 2, 100,
+                                        self.settings.WHITE)
                     self.draw_snow_fall()
 
                 # После отрисовки всего, меняем экранные страницы #

@@ -10,7 +10,7 @@ import inspect
 
 import settings
 import player
-import level_loader
+import level_load_info
 import scene_initial
 import scene_levels
 import scene_play
@@ -52,7 +52,7 @@ class Game():
     def load_game(self):
         print("Старт загрузки игры Xonix HNY 2024...")
         self.player = player.Player(self,self.settings)
-        self.level_loader = level_loader.Level_Loader(self,self.settings)
+        self.level_load_info = level_load_info.Level_Load_Info(self, self.settings)
         self.scene_initial = scene_initial.Scene_Initial(self, self.settings)
         self.scene_play = scene_play.Scene_Play(self, self.settings)
         self.scene_settings = scene_settings.Scene_Settings(self, self.settings)

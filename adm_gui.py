@@ -178,49 +178,83 @@ class Level_Button(pygame.sprite.Sprite):
         self.level_number = level_number
         self.allowed = True
         self.is_over = False
+        self.next_level = False
         self.lock_image = pygame.image.load( os.path.join( "levels", "lock.png") ).convert()
         self.lock_image.set_colorkey(self.settings.BLACK)
         self.lock_image = pygame.transform.scale(self.lock_image,
                                                 (self.rect.width, self.rect.height))
         self.read_from_db()
     def read_from_db(self):
-        query_level = """   select  p.id player_id, p.name name,
+        # запрос строк БД соответствующих текущему игроку и номеру уровня кнопки
+        query_playing_level = """   select  p.id player_id, p.name name,
                                     cl.score score, 
                                     pl.id level_id, pl.backround_image image
-                            from    Player p left outer join  
-                                    Completed_Level cl on p.id = cl.player_id left outer join
+                            from    Player p inner join  
+                                    Completed_Level cl on p.id = cl.player_id inner join
                                     Possible_Level pl ON cl.possible_level_id = pl.id 
                             WHERE   p.id  = %s and
 	                                pl.id = %s 
                      """ % ( self.game.player.id, self.level_number )
-        cursor = self.settings.db_connection.cursor()
-        cursor.execute(query_level)
-        rows = cursor.fetchall()
-        if len(rows)  <= 0:
-            if self.level_number == 1:
+        # запрос одной строки БД содержащей номер последнего сыгранного уровня для указанного игрока
+        query_last_level =   """
+                            select  p.id player_id, p.name name,
+                                    cl.score score, 
+                                    pl.id level_id, pl.backround_image image
+                            from    Player p inner join  
+                                    Completed_Level cl on p.id = cl.player_id inner join
+                                    Possible_Level pl ON cl.possible_level_id = pl.id 
+                            WHERE   p.id  = %s
+                            ORDER by pl.id DESC 
+                            LIMIT 1
+                            """ % self.game.player.id
+        cursor = self.settings.db_connection.cursor() # получим курсор БД
+        cursor.execute(query_playing_level) # выполним курсор с запросом
+        rows = cursor.fetchall() # получим все строки результата
+        cursor.close()
+        if len(rows)  <= 0: # в базе данных не найдено строк
+            if self.level_number == 1: # если на кнопку назначен 1 уровень -
+                                       # то всё равно сделать её активной и загрузить картинку
                 self.allowed = True
                 image_path = os.path.join("levels", "dragon1.jpg")
                 self.level_image = pygame.image.load(image_path).convert()
                 self.level_image = pygame.transform.scale(self.level_image,
                                                           (self.rect.width, self.rect.height))
-            else:
+            else: # иначе сделать кнопку пассивной
                 self.allowed = False
-            return
-        elif len(rows) == 1:
-            for row in rows:
+        elif len(rows) == 1: # из БД получена одна ожидаемая строка
+            for row in rows: # сделать кнопку активной и загрузить картинку
                 self.allowed = True
                 image_path = os.path.join( "levels", row[4] )
                 self.level_image = pygame.image.load( image_path ).convert()
                 self.level_image = pygame.transform.scale(self.level_image,
                                                           (self.rect.width, self.rect.height))
                 return
-        else:
+        else: # из БД получено больше одной строки, выводим ошибку !!!
             self.allowed = False
-            print("ERROR! Rows must be 1 ONE !!!! ")
+            print("1. ERROR for BUTTON LEVEL %s ! Rows must be 1 ONE !!!! " % self.level_number )
             return
+        cursor = self.settings.db_connection.cursor()  # получим курсор БД
+        cursor.execute( query_last_level )  # выполним курсор с запросом
+        rows = cursor.fetchall()  # получим все строки результата
+        cursor.close()
+        if len(rows) == 1: # из БД получено не 1 строка - наш случай, активируем кнопку и загрузим картинку
+            row = rows[0]
+            if row[3]+1 == self.level_number:
+                self.next_level = True
+                self.allowed = True
+                image_path = os.path.join("levels", "lock_open.png")
+                self.level_image = pygame.image.load(image_path).convert()
+                self.level_image = pygame.transform.scale(self.level_image,
+                                                          (self.rect.width, self.rect.height))
+        elif len(rows)==0:
+            return
+        elif len(rows)>1:
+            print("2. ERROR for BUTTON LEVEL %s ! Rows must be 1 ONE !!!! " % self.level_number)
+            return
+
     def update(self):
         pointer = pygame.mouse.get_pos()
-        if self.rect.collidepoint(pointer):  # if pointer is inside btnRect
+        if self.rect.collidepoint(pointer):  #
             self.is_over = True
         else:
             self.is_over = False
@@ -238,7 +272,8 @@ class Level_Button(pygame.sprite.Sprite):
         pygame.draw.rect(surface, self.settings.BLACK, self.rect, 5)
         if self.is_over:
             pygame.draw.rect(surface, self.settings.YELLOW, self.rect, 8)
-        self.game.draw_text_center(self.game.screen, str(self.level_number), 50,
+        text = str(self.level_number)
+        self.game.draw_text_center(self.game.screen, text, 50,
                             self.rect.centerx ,
                             self.rect.centery,
                             self.settings.RED)

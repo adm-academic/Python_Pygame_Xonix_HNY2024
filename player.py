@@ -27,7 +27,6 @@ class Player():
         self.name = row[1]
         self.score = row[2]
         self.registration_date = row[3]
-        print("####", self.name )
         self.settings.set_player_last_name( self.name )
 
     def in_db_alreay_exists(self,name): # возвращает истину если игрок с таким именем уже есть в таблице БД

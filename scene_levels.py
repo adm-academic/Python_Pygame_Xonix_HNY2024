@@ -78,8 +78,11 @@ class Scene_Levels():
                             return
                         for button_level in self.buttons_levels:
                             if button_level.rect.collidepoint(mouse_position):
-                                print( "@@@ MUST BE LOAD LEVEL - ", button_level.level_number )
-                                pass
+                                if button_level.allowed:
+                                    self.game.level_load_info.read_level_with_number_from_db(button_level.level_number)
+                                    print( "@@@ MUST BE LOAD LEVEL - ", button_level.level_number )
+                                    self.game.go_to_scene( self.game.SCENE_PLAY )
+                                    return
 
                 self.update()
                 self.draw()
