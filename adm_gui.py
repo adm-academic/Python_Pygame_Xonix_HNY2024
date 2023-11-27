@@ -214,11 +214,11 @@ class Level_Button(pygame.sprite.Sprite):
         if len(rows)  <= 0: # в базе данных не найдено строк
             if self.level_number == 1: # если на кнопку назначен 1 уровень -
                                        # то всё равно сделать её активной и загрузить картинку
-                self.allowed = True
-                image_path = os.path.join("levels", "dragon1.jpg")
-                self.level_image = pygame.image.load(image_path).convert()
-                self.level_image = pygame.transform.scale(self.level_image,
-                                                          (self.rect.width, self.rect.height))
+               self.allowed = True
+               image_path = os.path.join("levels", "lock_open.png")
+               self.level_image = pygame.image.load(image_path).convert()
+               self.level_image = pygame.transform.scale(self.level_image,
+                                                         (self.rect.width, self.rect.height))
             else: # иначе сделать кнопку пассивной
                 self.allowed = False
         elif len(rows) == 1: # из БД получена одна ожидаемая строка

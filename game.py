@@ -1,8 +1,5 @@
 import sys
 import os
-
-import scene_finish
-
 sys.path.append( os.path.dirname(__file__) )
 import pygame
 import random
@@ -18,6 +15,7 @@ import scene_settings
 import scene_records
 import scene_player_new
 import scene_player_select
+import scene_finish
 
 
 class Game():
