@@ -64,11 +64,11 @@ class Level_Load_Info():
             insert_win_level =  """
                                 INSERT INTO Completed_Level (player_id,possible_level_id,score,pl_datetime)
                                 VALUES (%s,%s,%s,%s);
-                                """ % (self.game.player.id,level_number,0,"datetime('now','localtime')")
+                                """ % (self.game.player.id,level_number,score,"datetime('now','localtime')")
             cursor = self.settings.db_connection.cursor()  # получим курсор БД
             cursor.execute(insert_win_level)  # выполним курсор с запросом
-            self.settings.db_connection.commit()
             cursor.close()
+            self.settings.db_connection.commit()
             pass
         else: # игрок уже проходил этот уровень, сделаем UPDATE !
             update_win_level =  """
@@ -82,23 +82,24 @@ class Level_Load_Info():
             cursor.execute(update_win_level)  # выполним курсор с запросом
             cursor.close()
             self.settings.db_connection.commit()
-            update_player_score = ( """
-                                    UPDATE Player as tp
-                                    set score = 
-                                    (
-                                    select  sum( cl.score )
-                                    from    Player p inner join  
-                                            Completed_Level cl on p.id = cl.player_id inner join
-                                            Possible_Level pl ON cl.possible_level_id = pl.id 
-                                    WHERE   p.id  = %s
-                                    )
-                                    WHERE tp.id = %s
-                                   """
-                               ) % ( self.game.player.id, self.game.player.id )
-            cursor = self.settings.db_connection.cursor()  # получим курсор БД
-            cursor.execute(update_player_score)  # выполним курсор с запросом
-            cursor.close()
-            self.settings.db_connection.commit()
+
+        update_player_score = ( """
+                                UPDATE Player as tp
+                                set score = 
+                                (
+                                select  sum( cl.score )
+                                from    Player p inner join  
+                                        Completed_Level cl on p.id = cl.player_id inner join
+                                        Possible_Level pl ON cl.possible_level_id = pl.id 
+                                WHERE   p.id  = %s
+                                )
+                                WHERE tp.id = %s
+                               """
+                           ) % ( self.game.player.id, self.game.player.id )
+        cursor = self.settings.db_connection.cursor()  # получим курсор БД
+        cursor.execute(update_player_score)  # выполним курсор с запросом
+        cursor.close()
+        self.settings.db_connection.commit()
 
     def player_reached_finish(self):
         query_player_last_level =   """
