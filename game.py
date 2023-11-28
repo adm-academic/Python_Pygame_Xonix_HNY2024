@@ -98,6 +98,12 @@ class Game():
         text_rect = text_surface.get_rect()  # получаем прямоугольник поверхности
         text_rect.center = (x, y)  # модифициуют прямоугольник, размещая его по переданным x,y
         surf.blit(text_surface, text_rect)  # блиттинг отрендеренного текста на переданную поверхность
+    def draw_text_left_top(self, surf, text, size, x, y, color ):
+        font = pygame.font.Font(self.settings.pygame_font_name, size)  # создаём объект шрифта
+        text_surface = font.render(text, True, color )  # рендерим текст шрифтом и получаем поверхность
+        text_rect = text_surface.get_rect()  # получаем прямоугольник поверхности
+        text_rect.topleft = (x, y)  # модифициуют прямоугольник, размещая его по переданным x,y
+        surf.blit(text_surface, text_rect)  # блиттинг отрендеренного текста на переданную поверхность
     def main_loops(self): # здесь запускаются главные циклы сцен
         print("Запускаю главные циклы сцен...")
         while True:

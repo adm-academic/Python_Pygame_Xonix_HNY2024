@@ -20,6 +20,7 @@ class Player():
         cursor = self.settings.db_connection.cursor()
         cursor.execute( query_get )
         rows = cursor.fetchall()
+        cursor.close()
         if len(rows) <=0:
             return
         row = rows[0]
@@ -28,6 +29,18 @@ class Player():
         self.score = row[2]
         self.registration_date = row[3]
         self.settings.set_player_last_name( self.name )
+
+    def get_score(self):
+        query_get_score = " select score from Player where id='%s'; " % self.id
+        cursor = self.settings.db_connection.cursor()
+        cursor.execute(query_get_score)
+        rows = cursor.fetchall()
+        cursor.close()
+        if len(rows)<=0:
+            return 0
+        else:
+            return rows[0][0]
+
 
     def in_db_alreay_exists(self,name): # возвращает истину если игрок с таким именем уже есть в таблице БД
         query_check = " select * from Player where name='%s'; " % ( name )

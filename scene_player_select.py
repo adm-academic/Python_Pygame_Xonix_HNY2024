@@ -94,9 +94,12 @@ class Scene_Player_Select():
                                     self.settings.WIDTH // 2,
                                     0,
                                     self.settings.GREEN)
-                self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
+                self.game.draw_text(self.game.screen,
+                                    '''играет "%s". Очков: %s''' % (
+                                    self.game.player.name, self.game.player.get_score()),
+                                    40,
                                     self.settings.WIDTH // 2,
-                                    50,
+                                    40,
                                     self.settings.GREEN)
 
                 pygame.display.flip()

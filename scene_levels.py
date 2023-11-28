@@ -41,6 +41,9 @@ class Scene_Levels():
                 self.buttons_levels.add(button_level)
                 idx += 1
         pass
+        self.button_finish = Finish_Button( self.game, self, self.game.settings )
+        self.button_finish.set_params(self.settings.HEIGHT - 60, self.settings.WIDTH // 2,
+                                      50, 500, "ФИНИШ !")
     def unload_scene(self):
         self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
         pass
@@ -50,12 +53,18 @@ class Scene_Levels():
         for btn in self.buttons_levels:
             btn.update()
         self.button_cancel.update()
+        if self.game.level_load_info.player_reached_finish():
+            self.button_finish.visible = True
+            self.button_finish.update()
+        else:
+            self.button_finish.visible = False
         pass
     def draw(self):
         self.game.screen.blit(self.image_backround, self.image_backround_rect)
         for btn in self.buttons_levels:
             btn.draw(self.game.screen)
         self.button_cancel.draw(self.game.screen)
+        self.button_finish.draw(self.game.screen)
     def scene_loop(self):
         try:
             while True:
@@ -76,11 +85,13 @@ class Scene_Levels():
                         if self.button_cancel.rect.collidepoint(mouse_position):
                             self.game.go_to_scene(self.game.SCENE_INITIAL)
                             return
+                        if self.button_finish.rect.collidepoint(mouse_position):
+                            self.game.go_to_scene(self.game.SCENE_FINISH)
+                            return
                         for button_level in self.buttons_levels:
                             if button_level.rect.collidepoint(mouse_position):
                                 if button_level.allowed:
                                     self.game.level_load_info.read_level_with_number_from_db(button_level.level_number)
-                                    print( "@@@ MUST BE LOAD LEVEL - ", button_level.level_number )
                                     self.game.go_to_scene( self.game.SCENE_PLAY )
                                     return
 
@@ -91,9 +102,12 @@ class Scene_Levels():
                                      self.settings.WIDTH // 2,
                                      0 ,
                                      self.settings.GREEN)
-                self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
+                self.game.draw_text(self.game.screen,
+                                    '''играет "%s". Очков: %s''' % (
+                                    self.game.player.name, self.game.player.get_score()),
+                                    40,
                                     self.settings.WIDTH // 2,
-                                    50,
+                                    40,
                                     self.settings.GREEN)
 
                 pygame.display.flip()

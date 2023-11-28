@@ -357,10 +357,13 @@ class Scene_Play():  # класс представляющий и управля
         pass
         self.logic_colors_counts = {"green": 0, "red": 0}  # счётчик клеток для зон заливки алгоритма floofill
         pass
-        self.enemy1 = Enemy(self,self.settings)
-        self.all_sprites.add(self.enemy1)
-        self.enemy2 = Enemy(self,self.settings)
-        self.all_sprites.add(self.enemy2)
+        # ---------- инициализируем спрайты врагов --------------
+        self.enemies_sprites = pygame.sprite.Group()
+        for i in range(self.game.level_load_info.enemies_count):
+            enemy = Enemy(self,self.settings)
+            enemy.speed_delay = self.game.level_load_info.enemies_delay
+            self.enemies_sprites.add(enemy)
+            self.all_sprites.add(enemy)
         # ------- инициализиуем падающий снег --------
         self.snow_list = []
         # Пройдемся 50 раз циклом и добавим снежинки в рандомную позицию x,y
@@ -368,6 +371,8 @@ class Scene_Play():  # класс представляющий и управля
             x = random.randrange(0, self.settings.WIDTH)
             y = random.randrange(0, self.settings.HEIGHT)
             self.snow_list.append([x, y])
+        pass
+
 
     def unload_scene(self):
         self.blured_hidden_image = True
@@ -387,12 +392,9 @@ class Scene_Play():  # класс представляющий и управля
             self.crushed_sprites.empty()
         if hasattr(self,'border_sprites') and self.border_sprites != None:
             self.border_sprites.empty()
-        if hasattr(self,'enemy1') and self.enemy1 != None:
-            self.enemy1.kill()
-            self.enemy1 = None
-        if hasattr(self,'enemy2') and self.enemy2 != None:
-            self.enemy2.kill()
-            self.enemy2 = None
+        if hasattr(self,'enemies_sprites') and self.enemies_sprites != None:
+            self.enemies_sprites.empty()
+            self.enemies_sprites = None
         self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
 
     def reload_scene(self):
@@ -403,11 +405,12 @@ class Scene_Play():  # класс представляющий и управля
         self.unload_scene()
         self.player_win_in_this_scene = True
         self.game.level_load_info.player_win_in_level_write_to_db(
-            self.game.level_load_info.level_id, 0)
+            self.game.level_load_info.level_id, self.game.level_load_info.score  )
         print("!!!!!!!!!! PLAYER WIN !!!!!!!!!!!!!!")
 
     def player_lose_scene(self):
         self.reload_scene()
+        self.game.level_load_info.score -= 50
         print("!!!!!!!!!! PLAYER LOSE !!!!!!!!!!!!!!")
 
     def get_blurSurf(self, surface, amt):  # размывает указанную поверхность
@@ -485,11 +488,7 @@ class Scene_Play():  # класс представляющий и управля
                     self.sprites_matrix[iy][ix].logic_color = ""
 
     def enemy_in_the_block(self, block_color):  # возвращает истину если в блоке указанного цвета есть враг
-        hits = pygame.sprite.spritecollide(self.enemy1, self.snow_sprites, False)
-        for hit in hits:
-            if hit.logic_color == block_color:
-                return True
-        hits = pygame.sprite.spritecollide(self.enemy2, self.snow_sprites, False)
+        hits = pygame.sprite.groupcollide( self.snow_sprites, self.enemies_sprites,  False, False )
         for hit in hits:
             if hit.logic_color == block_color:
                 return True
@@ -578,6 +577,37 @@ class Scene_Play():  # класс представляющий и управля
                 if not self.player_win_in_this_scene:
                         self.draw_hidden_image()  # выводим фоновую картинку
                         self.all_sprites.draw(self.game.screen)  # отрисовываем все спрайты встроенной функцией pygame
+                        self.game.draw_text_left_top(self.game.screen,
+                                                   "Скорость врагов(миллисекунд):"
+                                                     + str(self.game.level_load_info.enemies_delay) + ";",
+                                                   20,
+                                                   20,
+                                                   20,
+                                                   self.settings.ORANGE )
+                        self.game.draw_text_left_top(self.game.screen,
+                                                     "Очки игрока:" + str( self.game.level_load_info.score ) + ";",
+                                                     20,
+                                                     350,
+                                                     20,
+                                                     self.settings.ORANGE )
+                        self.game.draw_text_left_top(self.game.screen,
+                                                     "Набрано ранее:" + str(self.game.level_load_info.old_score) + ";",
+                                                     20,
+                                                     510,
+                                                     20,
+                                                     self.settings.ORANGE)
+                        self.game.draw_text_left_top(self.game.screen,
+                                                     "Для выхода нажмите ESC",
+                                                     20,
+                                                     720,
+                                                     20,
+                                                     self.settings.BLUE)
+                        self.game.draw_text_left_top(self.game.screen,
+                                                     "Для выхода нажмите ESC",
+                                                     20,
+                                                     720,
+                                                     18,
+                                                     self.settings.COLOR_INACTIVE )
                 elif self.player_win_in_this_scene:
                     if self.BLUR_RATIO > 1:
                         self.BLUR_RATIO -= 0.40
@@ -585,9 +615,13 @@ class Scene_Play():  # класс представляющий и управля
                         self.BLUR_RATIO = 1
                         self.blured_hidden_image = False
                     self.draw_hidden_image()  # выводим фоновую картинку
-                    self.game.draw_text(self.game.screen, "Победа за Вами ! ", 72, self.settings.WIDTH // 2, 0,
+                    self.game.draw_text(self.game.screen, "Победа за Вами ! ", 60, self.settings.WIDTH // 2, 0,
                                         self.settings.WHITE )
-                    self.game.draw_text(self.game.screen, "Нажмите любую клавишу ! ", 72, self.settings.WIDTH // 2, 100,
+                    self.game.draw_text(self.game.screen,
+                                        "Вы набрали %s очков ! " % (self.game.level_load_info.score),
+                                        60, self.settings.WIDTH // 2, 60,
+                                        self.settings.WHITE)
+                    self.game.draw_text(self.game.screen, "Нажмите любую клавишу ! ", 60, self.settings.WIDTH // 2, 120,
                                         self.settings.WHITE)
                     self.draw_snow_fall()
 
@@ -595,5 +629,6 @@ class Scene_Play():  # класс представляющий и управля
                 pygame.display.flip()
         except Exception as e:
             print('EXCEPTION: ', e)
+            raise e
             self.game.go_to_scene(self.game.SCENE_INITIAL)
             return

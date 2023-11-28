@@ -14,6 +14,7 @@ class Settings(): # класс хранящий все настройки игр
         self.YELLOW = (255, 255, 0)  # жёлтый
         self.GRAY = (100,100,100) # серый
         self.ORANGE = (255,165,0)
+        self.GOLD = (255, 215, 0)
         self.COLOR_INACTIVE = pygame.Color('lightskyblue3')
         self.COLOR_ACTIVE = pygame.Color('dodgerblue2')
         # ------ переменные настройки игры

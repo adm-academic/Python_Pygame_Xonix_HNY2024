@@ -172,7 +172,9 @@ class Scene_Initial():
 
             self.update()
             self.draw()
-            self.game.draw_text(self.game.screen, '''играет "%s"''' % self.game.player.name, 40,
+            self.game.draw_text(self.game.screen,
+                                '''играет "%s". Очков: %s''' % (self.game.player.name,self.game.player.get_score()),
+                                40,
                                 self.settings.WIDTH // 2,
                                 20,
                                 self.settings.GREEN)

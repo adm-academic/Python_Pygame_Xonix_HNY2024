@@ -67,7 +67,6 @@ class Menu_Button(pygame.sprite.Sprite):
                             self.rect.centerx + small_rect.width // 2,
                             small_rect.top + 6,
                             self.settings.ORANGE)
-
 class Player_Button(pygame.sprite.Sprite):
     def __init__(self, game, scene, settings):  # констуктор
         pygame.sprite.Sprite.__init__(self)
@@ -108,7 +107,6 @@ class Player_Button(pygame.sprite.Sprite):
                             self.rect.centerx ,
                             small_rect.top + 6,
                             self.settings.ORANGE)
-
 
 class InputBox:
     def __init__(self,game,settings, x, y, w, h, text=''):
@@ -152,7 +150,6 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
-
 
 class Level_Button(pygame.sprite.Sprite):
     # кнопки уровней я решил сделать "умными", они сами "ходят" БД и сами
@@ -211,6 +208,7 @@ class Level_Button(pygame.sprite.Sprite):
         cursor.execute(query_playing_level) # выполним курсор с запросом
         rows = cursor.fetchall() # получим все строки результата
         cursor.close()
+        self.settings.db_connection.commit()
         if len(rows)  <= 0: # в базе данных не найдено строк
             if self.level_number == 1: # если на кнопку назначен 1 уровень -
                                        # то всё равно сделать её активной и загрузить картинку
@@ -237,6 +235,7 @@ class Level_Button(pygame.sprite.Sprite):
         cursor.execute( query_last_level )  # выполним курсор с запросом
         rows = cursor.fetchall()  # получим все строки результата
         cursor.close()
+        self.settings.db_connection.commit()
         if len(rows) == 1: # из БД получено не 1 строка - наш случай, активируем кнопку и загрузим картинку
             row = rows[0]
             if row[3]+1 == self.level_number:
@@ -277,3 +276,40 @@ class Level_Button(pygame.sprite.Sprite):
                             self.rect.centerx ,
                             self.rect.centery,
                             self.settings.RED)
+
+class Finish_Button(pygame.sprite.Sprite):
+    def __init__(self, game, scene, settings):  # констуктор
+        pygame.sprite.Sprite.__init__(self)
+        self.game = game
+        self.scene = scene
+        self.settings = settings
+    def set_params(self,
+                   y_top,  # координата кнопки
+                   x_center,  # координата кнопки
+                   height,  # высота кнопки
+                   width,  # ширина кнопки
+                   text,  # текст, отобажаемый на кнопке
+                   ):
+        self.rect = pygame.Rect((0, 0), (width, height))
+        self.rect.centerx = x_center
+        self.rect.top = y_top
+        self.text = text
+        self.is_over = False
+        self.visible = False
+    def update(self):
+        pointer = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pointer):  # if pointer is inside btnRect
+            self.is_over = True
+        else:
+            self.is_over = False
+    def draw(self, surface):
+        if self.visible == False:
+            return
+        pygame.draw.rect(surface, self.settings.GOLD, self.rect)
+        pygame.draw.rect(surface, self.settings.GRAY, self.rect, 4)
+        if self.is_over:
+            pygame.draw.rect(surface, self.settings.BLUE, self.rect, 8)
+        self.game.draw_text_center(surface, self.text, 30,
+                            self.rect.centerx ,
+                            self.rect.centery+3,
+                            self.settings.BLUE)
