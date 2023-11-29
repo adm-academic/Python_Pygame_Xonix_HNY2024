@@ -25,26 +25,7 @@ class Menu_Button(pygame.sprite.Sprite):
         self.text = text
         self.is_over = False
     def key_to_string(self,key):
-        if   key==pygame.K_0:
-            return "0"
-        elif key==pygame.K_1:
-            return "1"
-        elif key==pygame.K_2:
-            return "2"
-        elif key==pygame.K_3:
-            return "3"
-        elif key==pygame.K_4:
-            return "4"
-        elif key==pygame.K_5:
-            return "5"
-        elif key==pygame.K_6:
-            return "6"
-        elif key==pygame.K_7:
-            return "7"
-        elif key==pygame.K_8:
-            return "8"
-        elif key==pygame.K_9:
-            return "9"
+        return  pygame.key.name(key)
 
     def update(self):
         pointer = pygame.mouse.get_pos()
@@ -109,7 +90,8 @@ class Player_Button(pygame.sprite.Sprite):
                             self.settings.ORANGE)
 
 class InputBox:
-    def __init__(self,game,settings, x, y, w, h, text=''):
+    def __init__(self,game,settings, x, y, w, h, text='', label=''):
+        self.label = label
         self.game = game
         self.settings = settings
         self.rect = pygame.Rect(x, y, w, h)
@@ -150,6 +132,10 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
+        # Label ...
+        self.label_surface = self.settings.LABEL_FONT.render( self.label, True, self.settings.WHITE )
+        screen.blit( self.label_surface, (self.rect.x + 5, self.rect.y - 45)  )
+
 
 class Level_Button(pygame.sprite.Sprite):
     # кнопки уровней я решил сделать "умными", они сами "ходят" БД и сами

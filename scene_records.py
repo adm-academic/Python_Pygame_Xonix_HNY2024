@@ -39,10 +39,43 @@ class Scene_Records():
                 self.update()
                 self.draw()
 
-                self.game.draw_text (self.game.screen, "Сцена списка рекордов !", 72,
-                                     self.settings.WIDTH // 2,
-                                     self.settings.HEIGHT // 2,
-                                     self.settings.GREEN )
+                self.game.draw_text(self.game.screen, "Рекорды.", 40,
+                                    self.settings.WIDTH // 2,
+                                    0,
+                                    self.settings.GREEN)
+                self.game.draw_text(self.game.screen,
+                                    '''играет "%s". Очков: %s''' % (
+                                        self.game.player.name, self.game.player.get_score()),
+                                    40,
+                                    self.settings.WIDTH // 2,
+                                    40,
+                                    self.settings.GREEN)
+
+                query_top_5 = """
+                              SELECT *
+                              FROM   (
+                              SELECT *
+                              FROM  Player pi
+                              ORDER BY pi.id 
+                              ) as po
+                              ORDER BY po.score desc
+                              LIMIT 5;
+                              """
+                cursor = self.settings.db_connection.cursor()
+                cursor.execute(query_top_5)
+                rows = cursor.fetchall()
+                cursor.close()
+                yy = 250
+                for row in rows:
+                    self.game.draw_text_left_top(self.game.screen,
+                                               str(row[1]) + " : " + str(row[2]),
+                                               51,
+                                               300,
+                                               yy,
+                                               self.settings.YELLOW
+                                               )
+                    yy += 70
+
 
                 pygame.display.flip()
         except Exception as e:

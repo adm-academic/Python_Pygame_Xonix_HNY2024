@@ -15,6 +15,7 @@ class Settings(): # класс хранящий все настройки игр
         self.GRAY = (100,100,100) # серый
         self.ORANGE = (255,165,0)
         self.GOLD = (255, 215, 0)
+        self.BRIGHT_BLUE = (66,170,255)
         self.COLOR_INACTIVE = pygame.Color('lightskyblue3')
         self.COLOR_ACTIVE = pygame.Color('dodgerblue2')
         # ------ переменные настройки игры
@@ -28,16 +29,19 @@ class Settings(): # класс хранящий все настройки игр
         self.pygame_font_name = pygame.font.match_font('Arial')  # Получаем имя шрифта ближайшего к 'arial'
         self.INPUT_FONT_SIZE = 72
         self.INPUT_FONT = pygame.font.Font(None, self.INPUT_FONT_SIZE )
+        self.LABEL_FONT_SIZE = 50
+        self.LABEL_FONT = pygame.font.Font(None, self.LABEL_FONT_SIZE)
         pass
         self.db_connection = sqlite3.connect('hny_xonix_game.db')
         pass
 
-    def save_SPRITE_SIZE(self,SPRITE_SIZE):
-        self.SPRITE_SIZE = SPRITE_SIZE
-        self.KV_set_value( self, "SPRITE_SIZE", self.SPRITE_SIZE )
     def save_FPS(self,FPS):
         self.FPS = FPS
-        self.KV_set_value( self, "FPS", self.FPS )
+        self.KV_set_value( "FPS", self.FPS )
+
+    def get_FPS(self):
+        self.FPS = int(self.KV_get_value("FPS"))
+        return self.FPS
 
     def KV_key_exist(self,key):
         query_check = " select * from Settings_Key_Value where key='%s'; " % (key)
@@ -53,6 +57,7 @@ class Settings(): # класс хранящий все настройки игр
             query_set = "insert into Settings_Key_Value(key,value) values ('%s','%s');" % (key,value)
         cursor = self.db_connection.cursor()
         cursor.execute( query_set )
+        cursor.close()
         self.db_connection.commit()
 
     def KV_get_value(self,key):
