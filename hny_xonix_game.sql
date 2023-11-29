@@ -1,7 +1,7 @@
 PRAGMA foreign_keys=on;
 
-UPDATE sqlite_sequence SET seq =11 where name = "Player";
-UPDATE sqlite_sequence SET seq = 17 where name = "Possible_Level";
+UPDATE sqlite_sequence SET seq =3 where name = "Player";
+UPDATE sqlite_sequence SET seq = 16 where name = "Possible_Level";
 
 DELETE FROM  Completed_Level;
 
@@ -17,23 +17,7 @@ VALUES (1,'Just_a_Player',0,'2023-11-25 12:19:12');
 INSERT INTO Player (id,name,score,registration_date)
 VALUES (2,'adm-fil',0,'2023-11-25 15:12:22');
 INSERT INTO Player (id,name,score,registration_date)
-VALUES (3,'fox-malder',0,'2023-11-26 11:17:08');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (4,'Filosof',0,'2023-11-26 11:17:21');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (5,'dmitryalexeev',0,'2023-11-26 11:18:12');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (6,'gamer',0,'2023-11-26 11:18:28');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (7,'igrok',0,'2023-11-26 11:27:22');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (8,'lammer',0,'2023-11-26 11:28:08');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (9,'noob',0,'2023-11-26 11:28:15');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (10,'user',0,'2023-11-26 11:28:29');
-INSERT INTO Player (id,name,score,registration_date)
-VALUES (11,'guru',0,'2023-11-26 11:28:43');
+VALUES (3,'gamer',0,'2023-11-26 11:18:28');
 
 
 
@@ -86,6 +70,8 @@ INSERT INTO Settings_Key_Value (key,value)
 VALUES ('test1_key','test1_value');
 INSERT INTO Settings_Key_Value (key,value)
 VALUES ('player_last_name','Just_a_Player');
+INSERT INTO Settings_Key_Value (key,value)
+VALUES ('FPS','60');
 
 
 DROP TABLE IF EXISTS Completed_Level;
@@ -97,12 +83,6 @@ CREATE table Completed_Level(
 	FOREIGN KEY (player_id) REFERENCES Player(id),
 	FOREIGN KEY (possible_level_id) REFERENCES Possible_Level(id)
 );
-INSERT INTO Completed_Level(player_id,possible_level_id,score,pl_datetime)
-VALUES (1,1,100,'2023-11-26 11:28:43');
-INSERT INTO Completed_Level(player_id,possible_level_id,score,pl_datetime)
-VALUES (1,2,100,'2023-11-26 11:28:43');
-INSERT INTO Completed_Level(player_id,possible_level_id,score,pl_datetime)
-VALUES (1,3,100,'2023-11-26 11:28:43');
 
 
 
