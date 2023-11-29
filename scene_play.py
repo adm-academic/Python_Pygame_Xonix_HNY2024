@@ -402,6 +402,7 @@ class Scene_Play():  # класс представляющий и управля
         self.load_scene()
 
     def player_win_scene(self):
+        self.game.sound_level_win.play()
         self.unload_scene()
         self.player_win_in_this_scene = True
         self.game.level_load_info.player_win_in_level_write_to_db(
@@ -409,6 +410,7 @@ class Scene_Play():  # класс представляющий и управля
         print("!!!!!!!!!! PLAYER WIN !!!!!!!!!!!!!!")
 
     def player_lose_scene(self):
+        self.game.sound_level_over.play()
         self.reload_scene()
         self.game.level_load_info.score -= 50
         print("!!!!!!!!!! PLAYER LOSE !!!!!!!!!!!!!!")
@@ -495,6 +497,7 @@ class Scene_Play():  # класс представляющий и управля
         return False
 
     def process_hide_snow_sprites(self, begin_cell_1, begin_cell_2):  # обрабатываем скрытие зон спрайтов на поле
+        self.game.sound_snow_disappeared.play()
         self.floodfill_sprites_zone(begin_cell_1[0], begin_cell_1[1], "green")
         self.floodfill_sprites_zone(begin_cell_2[0], begin_cell_2[1], "red")
         if self.logic_colors_counts["green"] < self.logic_colors_counts["red"]:

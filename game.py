@@ -61,6 +61,12 @@ class Game():
         self.scene_player_new = scene_player_new.Scene_Player_New(self, self.settings)
         self.scene_player_select = scene_player_select.Scene_Player_Select(self,self.settings)
         self.scene_help = scene_help.Scene_Help(self,self.settings)
+        self.sound_level_win = pygame.mixer.Sound('music/level-win.ogg')
+        self.sound_level_over = pygame.mixer.Sound('music/level-over.ogg')
+        self.sound_snow_disappeared = pygame.mixer.Sound('music/snow-disappeared.ogg')
+        pygame.mixer.music.load('music/Jingle-Bells.ogg')
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(loops=-1)
 
     def unload_game(self):
         print("Выгрузка игры...")
