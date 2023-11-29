@@ -26,10 +26,18 @@ class Settings(): # класс хранящий все настройки игр
         self.HEIGHT = (self.HEIGHT // self.SPRITE_SIZE) * self.SPRITE_SIZE
         pygame.font.init()  # инициализируем шрифты pygame
         self.pygame_font_name = pygame.font.match_font('Arial')  # Получаем имя шрифта ближайшего к 'arial'
-        self.INPUT_FONT = pygame.font.Font(None, 72)
+        self.INPUT_FONT_SIZE = 72
+        self.INPUT_FONT = pygame.font.Font(None, self.INPUT_FONT_SIZE )
         pass
         self.db_connection = sqlite3.connect('hny_xonix_game.db')
         pass
+
+    def save_SPRITE_SIZE(self,SPRITE_SIZE):
+        self.SPRITE_SIZE = SPRITE_SIZE
+        self.KV_set_value( self, "SPRITE_SIZE", self.SPRITE_SIZE )
+    def save_FPS(self,FPS):
+        self.FPS = FPS
+        self.KV_set_value( self, "FPS", self.FPS )
 
     def KV_key_exist(self,key):
         query_check = " select * from Settings_Key_Value where key='%s'; " % (key)
