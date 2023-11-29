@@ -68,9 +68,15 @@ class Scene_Initial():
         self.menu_button_records.set_params(530, self.settings.WIDTH // 2, 50, 400,
                                              pygame.K_5, "Рекорды.")
         self.menu_buttons_group.add(self.menu_button_records)
+        pass
+        self.menu_button_help = Menu_Button(self.game, self, self.settings)
+        self.menu_button_help.set_params(600, self.settings.WIDTH // 2, 50, 400,
+                                         pygame.K_6, "Помощь.")
+        self.menu_buttons_group.add(self.menu_button_help)
+        pass
         self.menu_button_quit = Menu_Button(self.game, self, self.settings)
-        self.menu_button_quit.set_params(600, self.settings.WIDTH // 2, 50, 400,
-                                            pygame.K_6, "Выйти из игры.")
+        self.menu_button_quit.set_params(670, self.settings.WIDTH // 2, 50, 400,
+                                            pygame.K_7, "Выйти из игры.")
         self.menu_buttons_group.add(self.menu_button_quit)
         pass
         self.snow_flakes_list = []
@@ -146,6 +152,9 @@ class Scene_Initial():
                         self.game.go_to_scene(self.game.SCENE_RECORDS)
                         return
                     if event.key == pygame.K_6:
+                        self.game.go_to_scene(self.game.SCENE_RECORDS)
+                        return
+                    if event.key == pygame.K_7:
                         self.game.exit_from_game()
                         return
 
@@ -165,6 +174,9 @@ class Scene_Initial():
                         return
                     elif self.menu_button_records.rect.collidepoint(mouse_position):
                         self.game.go_to_scene(self.game.SCENE_RECORDS)
+                        return
+                    elif self.menu_button_help.rect.collidepoint(mouse_position):
+                        self.game.go_to_scene(self.game.SCENE_HELP)
                         return
                     elif self.menu_button_quit.rect.collidepoint(mouse_position):
                         self.game.exit_from_game()

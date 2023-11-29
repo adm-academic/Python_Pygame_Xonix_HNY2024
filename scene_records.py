@@ -3,6 +3,7 @@ import random
 import os
 import inspect
 import sys
+from adm_gui import *
 
 class Scene_Records():
     def __init__(self, game, settings):  # констуктор
@@ -15,15 +16,21 @@ class Scene_Records():
                                                       (self.settings.WIDTH, self.settings.HEIGHT))
         self.image_backround_rect = self.image_backround.get_rect()
         pass
+        self.button_cancel = Menu_Button(self.game, self, self.settings)
+        self.button_cancel.set_params(130, 140, 50, 200,
+                                      pygame.K_1, "Выйти.")
+        pass
     def unload_scene(self):
         self.game.screen.fill(self.settings.BLACK)  # заполняем всё окно чёрным
         pass
     def reload_scene(self):
         pass
     def update(self):
+        self.button_cancel.update()
         pass
     def draw(self):
         self.game.screen.blit(self.image_backround, self.image_backround_rect)
+        self.button_cancel.draw(self.game.screen)
     def scene_loop(self):
         try:
             while True:
@@ -35,6 +42,15 @@ class Scene_Records():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         self.game.go_to_scene(self.game.SCENE_INITIAL)
                         return
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_1:
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_position = pygame.mouse.get_pos()
+                        if self.button_cancel.rect.collidepoint(mouse_position):
+                            self.game.go_to_scene(self.game.SCENE_INITIAL)
+                            return
 
                 self.update()
                 self.draw()

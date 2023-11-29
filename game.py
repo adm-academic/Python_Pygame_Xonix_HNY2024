@@ -16,7 +16,7 @@ import scene_records
 import scene_player_new
 import scene_player_select
 import scene_finish
-
+import scene_help
 
 class Game():
     # допустимые сцены игры
@@ -28,6 +28,7 @@ class Game():
     SCENE_RECORDS     = 6
     SCENE_PLAYER_NEW  = 7
     SCENE_PLAYER_SELECT = 8
+    SCENE_HELP        = 9
     SCENE_EXIT        = 0
     def __init__(self):
         self.code_of_scene = self.SCENE_INITIAL
@@ -59,6 +60,7 @@ class Game():
         self.scene_records = scene_records.Scene_Records(self,self.settings)
         self.scene_player_new = scene_player_new.Scene_Player_New(self, self.settings)
         self.scene_player_select = scene_player_select.Scene_Player_Select(self,self.settings)
+        self.scene_help = scene_help.Scene_Help(self,self.settings)
 
     def unload_game(self):
         print("Выгрузка игры...")
@@ -80,6 +82,7 @@ class Game():
         self.scene_finish.unload_scene()
         self.scene_records.unload_scene()
         self.scene_player_new.unload_scene()
+        self.scene_help.unload_scene()
         pass
         self.code_of_scene = scene_code
         pass
@@ -144,6 +147,10 @@ class Game():
                 self.scene_finish.load_scene()
                 self.scene_finish.scene_loop()
                 pass
+            elif self.code_of_scene == self.SCENE_HELP:
+                self.scene_help.unload_scene()
+                self.scene_help.load_scene()
+                self.scene_help.scene_loop()
             elif self.code_of_scene == self.SCENE_EXIT:
                 print("Выход из обработки игровых сцен...")
                 pygame.quit()

@@ -13,6 +13,7 @@ class Settings(): # класс хранящий все настройки игр
         self.BLUE = (0, 0, 255)  # синий
         self.YELLOW = (255, 255, 0)  # жёлтый
         self.GRAY = (100,100,100) # серый
+        self.DARK_GRAY = (50, 50, 50)  # серый
         self.ORANGE = (255,165,0)
         self.GOLD = (255, 215, 0)
         self.BRIGHT_BLUE = (66,170,255)
