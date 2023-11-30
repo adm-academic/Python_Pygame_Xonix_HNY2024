@@ -1,5 +1,5 @@
-.~lock.схемы_и_математика.ods#
-.~lock.схемы.odg#
+*.ods#
+*.odg#
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
