@@ -179,7 +179,6 @@ class Scene_Help():
 
                 pygame.display.flip()
         except Exception as e:
-            raise e
             print('EXCEPTION: ', e)
             self.game.go_to_scene(self.game.SCENE_INITIAL)
             return
