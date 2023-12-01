@@ -31,35 +31,35 @@ CREATE table Possible_Level(
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
 VALUES (1,1,100,'dragon1.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (2,1,90,'dragon2.jpg');
+VALUES (2,1,95,'dragon2.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (3,1,80,'dragon3.jpg');
+VALUES (3,1,90,'dragon3.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (4,1,70,'dragon4.jpg');
+VALUES (4,1,85,'dragon4.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
 VALUES (5,2,100,'dragon5.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (6,2,90,'dragon6.jpg');
+VALUES (6,2,95,'dragon6.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (7,2,80,'dragon7.jpg');
+VALUES (7,2,90,'dragon7.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (8,2,70,'dragon8.jpg');
+VALUES (8,2,85,'dragon8.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (9,3,100,'dragon9.jpg');
+VALUES (9,3,110,'dragon9.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (10,3,90,'dragon10.jpg');
+VALUES (10,3,105,'dragon10.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (11,3,80,'dragon11.jpg');
+VALUES (11,3,100,'dragon11.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (12,3,70,'dragon12.jpg');
+VALUES (12,3,95,'dragon12.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (13,3,60,'dragon13.jpg');
+VALUES (13,3,90,'dragon13.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (14,3,50,'dragon14.jpg');
+VALUES (14,3,85,'dragon14.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (15,3,40,'dragon15.jpg');
+VALUES (15,3,80,'dragon15.jpg');
 INSERT INTO Possible_Level (id,enemies_count,enemies_delay,backround_image) 
-VALUES (16,3,30,'dragon16.jpg');
+VALUES (16,3,75,'dragon16.jpg');
 
 DROP TABLE IF EXISTS Settings_Key_Value;
 CREATE table Settings_Key_Value(
